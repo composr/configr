@@ -1,6 +1,6 @@
 mongodb:
-  uri: mongodb://localhost:27017/?readPreference=primary&ssl=false
+  uri: mongodb://localhost:27017/?ssl=false
   db: configr
   auth_db: admin
-  username: foo
-  password: bar
+  username:
+  password:

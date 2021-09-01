@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import com.google.common.base.Strings;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
@@ -29,6 +30,15 @@ public class MongoConfiguration {
   private String authDB;
 
   public @Bean MongoClient mongoClient() {
+    return Strings.isNullOrEmpty(username) ? getMongoClientNoAuth() : getMongoClientWithAuth();
+  }
+
+  private MongoClient getMongoClientNoAuth() {
+    return MongoClients.create(
+        MongoClientSettings.builder().applyConnectionString(new ConnectionString(uri)).build());
+  }
+
+  private MongoClient getMongoClientWithAuth() {
     return MongoClients
         .create(MongoClientSettings.builder().applyConnectionString(new ConnectionString(uri))
             .credential(MongoCredential.createCredential(username, db, password.toCharArray()))
