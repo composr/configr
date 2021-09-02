@@ -1,0 +1,6 @@
+mongodb:
+  uri: mongodb://localhost:27017/?ssl=false
+  db: configr
+  auth_db: admin
+  username:
+  password:
