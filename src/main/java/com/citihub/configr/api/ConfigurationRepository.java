@@ -6,6 +6,6 @@ import com.citihub.configr.namespace.Namespace;
 
 public interface ConfigurationRepository extends MongoRepository<Namespace, String> {
 
-  public Optional<Namespace> findByKey(String key);
+  public Optional<Namespace> findByNamespace(String namespace);
 
 }

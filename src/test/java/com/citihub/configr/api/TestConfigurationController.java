@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.citihub.configr.namespace.Metadata;
 import com.citihub.configr.namespace.Namespace;
 import com.mongodb.client.MongoClient;
 
@@ -35,7 +34,7 @@ public class TestConfigurationController {
   @BeforeAll
   public void setupMock() {
     when(configurationRepository.findById("/configuration"))
-        .thenReturn(Optional.of(new Namespace(new Metadata(), "foo", "bar")));
+        .thenReturn(Optional.of(new Namespace("foo", "bar", null)));
   }
 
   @Test
