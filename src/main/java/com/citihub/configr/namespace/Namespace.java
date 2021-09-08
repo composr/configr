@@ -1,15 +1,16 @@
 package com.citihub.configr.namespace;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonKey;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
-@NoArgsConstructor
+@Slf4j
 @JsonSerialize(using = NamespaceSerializer.class)
 @JsonDeserialize(using = NamespaceDeserializer.class)
 public class Namespace {
@@ -18,18 +19,26 @@ public class Namespace {
   private Metadata metadata;
 
   @Id
-  private String _id;
+  private String namespace;
+
+  @JsonKey
   private String key;
+
+  @JsonValue
   private Object value;
 
-  public Namespace(String key, Object value) {
-    this.key = key;
-    this.value = value;
+  public Namespace() {
+    this("", null);
   }
 
-  public Namespace(Metadata metadata, String key, Object value) {
-    this.metadata = metadata;
+  public Namespace(String key, Object value) {
+    this(key, value, "");
+  }
+
+  public Namespace(String key, Object value, String fullNamespace) {
     this.key = key;
     this.value = value;
+    this.namespace = fullNamespace;
   }
+
 }
