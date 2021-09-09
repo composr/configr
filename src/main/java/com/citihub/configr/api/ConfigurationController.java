@@ -33,7 +33,10 @@ public class ConfigurationController {
         (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
     log.info("You asked for: " + fullPath);
 
-    return configurationService.fetchNamespace(fullPath);
+    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
+      return wrapResponseNS( configurationService.fetchNamespace(fullPath) );
+    else
+      throw new BadURIException();
   }
 
   @PostMapping(consumes = {"application/json", "application/yaml", "application/yml"},
@@ -51,7 +54,8 @@ public class ConfigurationController {
   }
 
   private Namespace wrapResponseNS(Namespace ns) {
-    return new Namespace("", Collections.singletonMap(ns.getKey(), ns));
+    return ns == null ? null :  
+      new Namespace("", Collections.singletonMap(ns.getKey(), ns));
   }
 
 

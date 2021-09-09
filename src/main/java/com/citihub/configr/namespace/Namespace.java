@@ -1,6 +1,7 @@
 package com.citihub.configr.namespace;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonKey;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
+@Document
 @JsonSerialize(using = NamespaceSerializer.class)
 @JsonDeserialize(using = NamespaceDeserializer.class)
 public class Namespace {
