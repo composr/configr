@@ -9,11 +9,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import com.citihub.configr.namespace.MongoNamespaceQueries;
 import com.citihub.configr.namespace.Namespace;
 import com.mongodb.client.MongoClient;
 
@@ -29,11 +32,14 @@ public class TestConfigurationController {
   private MongoClient mongoClient;
 
   @MockBean
+  private MongoNamespaceQueries nsQueries;
+  
+  @MockBean
   private ConfigurationRepository configurationRepository;
 
   @BeforeAll
   public void setupMock() {
-    when(configurationRepository.findById("/configuration"))
+    when(configurationRepository.findNamespaceById("/configuration"))
         .thenReturn(Optional.of(new Namespace("foo", "bar", null)));
   }
 
@@ -43,8 +49,13 @@ public class TestConfigurationController {
   }
 
   @Test
-  public void testGet() throws Exception {
-    mockMvc.perform(get("/configuration")).andDo(print()).andExpect(status().isOk());
+  public void testGetBadRequest() throws Exception {
+    mockMvc.perform(get("/configuration")).andDo(print()).andExpect(status().isBadRequest());
   }
 
+  @Test
+  public void testGetValid() throws Exception {
+    mockMvc.perform(get("/configuration/x")).andDo(print()).andExpect(status().isOk());
+  }
+  
 }

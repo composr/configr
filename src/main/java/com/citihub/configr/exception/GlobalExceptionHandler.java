@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -18,6 +20,9 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<String> handleDefaultException(Throwable ex) {
     String errorResponse = "Unknown error occurred.";
+
+    log.error("{}", ex);
+    
     return new ResponseEntity<String>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
