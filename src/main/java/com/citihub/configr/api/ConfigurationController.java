@@ -34,7 +34,8 @@ public class ConfigurationController {
     log.info("You asked for: " + fullPath);
 
     if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
-      return wrapResponseNS( configurationService.fetchNamespace(fullPath) );
+      // TODO: if fetchNamespace is null, return 404
+      return wrapResponseNS(configurationService.fetchNamespace(fullPath));
     else
       throw new BadURIException();
   }
@@ -54,8 +55,7 @@ public class ConfigurationController {
   }
 
   private Namespace wrapResponseNS(Namespace ns) {
-    return ns == null ? null :  
-      new Namespace("", Collections.singletonMap(ns.getKey(), ns));
+    return ns == null ? null : new Namespace("", Collections.singletonMap(ns.getKey(), ns));
   }
 
 

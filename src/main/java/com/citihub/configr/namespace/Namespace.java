@@ -1,8 +1,9 @@
 package com.citihub.configr.namespace;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.annotation.JsonKey;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -17,10 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 @JsonDeserialize(using = NamespaceDeserializer.class)
 public class Namespace {
 
-  @JsonIgnore
   private Metadata metadata;
 
+  private Version version;
+
   @Id
+  @TextIndexed
   private String namespace;
 
   @JsonKey
