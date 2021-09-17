@@ -13,4 +13,6 @@ public class Metadata {
   private String owner;
   private String somethingElse;
 
+  private String[] tags;
+
 }

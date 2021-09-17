@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     String errorResponse = "Unknown error occurred.";
 
     log.error("{}", ex);
-    
+
     return new ResponseEntity<String>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

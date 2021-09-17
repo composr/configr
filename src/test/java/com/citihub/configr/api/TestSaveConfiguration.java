@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.namespace.Namespace;
 import com.mongodb.client.MongoClient;
 
@@ -39,7 +40,7 @@ public class TestSaveConfiguration {
   private MongoClient mongoClient;
 
   @MockBean
-  private ConfigurationRepository configurationRepository;
+  private MongoConfigRepository configurationRepository;
 
   @BeforeAll
   public void setupMock() {
