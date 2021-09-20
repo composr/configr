@@ -24,10 +24,13 @@ public class TestConfigurationController {
 
   @MockBean
   private MongoClient mongoClient;
-
+  
   @MockBean
   private MongoNamespaceQueries nsQueries;
-
+  
+  @MockBean
+  private ConfigurationService configurationService;
+  
   @Test
   public void testNotFound() throws Exception {
     mockMvc.perform(get("/foo/bar/baz")).andDo(print()).andExpect(status().isNotFound());
@@ -39,8 +42,8 @@ public class TestConfigurationController {
   }
 
   @Test
-  public void testGetValid() throws Exception {
+  public void testGetFound() throws Exception {
     mockMvc.perform(get("/configuration/x")).andDo(print()).andExpect(status().isOk());
   }
-
+  
 }

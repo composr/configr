@@ -3,7 +3,9 @@ package com.citihub.configr.api;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
 import com.citihub.configr.namespace.Namespace;
@@ -37,8 +39,10 @@ public class ConfigurationService {
     this.mongoObjectMapper = mongoObjectMapper;
   }
 
-  public Namespace fetchNamespace(String fullPath) {
+  public @NonNull Namespace fetchNamespace(String fullPath) {
     Namespace ns = nsQueries.findByPath(trimPath(fullPath));
+    if( ns == null )
+      throw new NotFoundException();
     log.info("using path {}, I found: {}", trimPath(fullPath), ns);
     return ns;
   }
