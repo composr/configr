@@ -6,6 +6,8 @@
 	<artifactId>configr</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Configuration Store</name>
+	<packaging>jar</packaging>
+	
 
 	<properties>
 		<spring.framework.version>5.3.9</spring.framework.version>
@@ -99,6 +101,17 @@
 						<configuration>
 							<dataFile>target/jacoco.exec</dataFile>
 							<outputDirectory>target/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<mainClass>com.citihub.configr.ConfigurationStoreApplication</mainClass>
 						</configuration>
 					</execution>
 				</executions>
