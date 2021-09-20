@@ -16,5 +16,6 @@ jobs:
           dns-name-label: configr-mongo-dev
           image: mongo:4.2.16
           name: configr-mongo-dev
+          ports: 27017
           secure-environment-variables: MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
           location: 'east us 2'
