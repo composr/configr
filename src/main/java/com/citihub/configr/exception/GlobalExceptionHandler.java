@@ -17,6 +17,13 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseEntity<String> handleJsonMappingException(NotFoundException ex) {
+    return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.NOT_FOUND);
+  }
+
+  
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<String> handleDefaultException(Throwable ex) {
     String errorResponse = "Unknown error occurred.";

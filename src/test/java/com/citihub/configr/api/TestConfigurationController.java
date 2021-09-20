@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
-import com.mongodb.client.MongoClient;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -23,11 +22,11 @@ public class TestConfigurationController {
   private MockMvc mockMvc;
 
   @MockBean
-  private MongoClient mongoClient;
-
-  @MockBean
   private MongoNamespaceQueries nsQueries;
-
+  
+  @MockBean
+  private ConfigurationService configurationService;
+  
   @Test
   public void testNotFound() throws Exception {
     mockMvc.perform(get("/foo/bar/baz")).andDo(print()).andExpect(status().isNotFound());
@@ -39,8 +38,8 @@ public class TestConfigurationController {
   }
 
   @Test
-  public void testGetValid() throws Exception {
+  public void testGetFound() throws Exception {
     mockMvc.perform(get("/configuration/x")).andDo(print()).andExpect(status().isOk());
   }
-
+  
 }
