@@ -33,7 +33,6 @@ jobs:
       - run: |
           docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/configr:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/configr:${{ github.sha }}
-
       - name: 'Deploy to Azure Container Instances'
         uses: 'azure/aci-deploy@v1'
         with:
@@ -43,6 +42,6 @@ jobs:
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          secure-environment-variables: MONGO_DB_CONNECTION_STRING=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?tls=true
+          secure-environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?tls=true
           name: configr-dev
           location: 'east us 2'
