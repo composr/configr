@@ -6,10 +6,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import com.citihub.configr.mongostorage.MongoNamespaceDeserializer;
+import com.citihub.configr.mongostorage.MongoNamespaceSerializer;
 import com.citihub.configr.namespace.Namespace;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,6 +30,10 @@ public class TestNamespaceSerializer {
   @BeforeAll
   public void setup() {
     mapper = new ObjectMapper();
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(Namespace.class, new MongoNamespaceSerializer());
+    module.addDeserializer(Namespace.class, new MongoNamespaceDeserializer());
+    mapper.registerModule(module);
   }
 
   @Test

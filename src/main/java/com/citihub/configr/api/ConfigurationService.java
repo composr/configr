@@ -30,7 +30,8 @@ public class ConfigurationService {
   private final int LEADING_SLASH_IDX = 1;
 
   public ConfigurationService(@Autowired MongoConfigRepository configRepo,
-      @Autowired MongoNamespaceQueries nsQueries, @Autowired ObjectMapper mongoObjectMapper) {
+      @Autowired MongoNamespaceQueries nsQueries, 
+      @Autowired ObjectMapper mongoObjectMapper) {
     this.configRepo = configRepo;
     this.nsQueries = nsQueries;
     this.mongoObjectMapper = mongoObjectMapper;

@@ -15,13 +15,13 @@ public class MongoNamespaceSerializer extends JsonSerializer<Namespace> {
   @Override
   public void serialize(Namespace namespace, JsonGenerator gen, SerializerProvider serializers)
       throws IOException {
-    log.info("Writing object {}", namespace.getKey());
+    log.info("Writing object to mongo {}", namespace.getKey());
     if (namespace.getValue() instanceof Namespace) {
       log.info("Found a namespace {}", namespace.getKey());
       writeObjectValue(namespace.getVersion(), gen);
       writeObjectValue(namespace.getValue(), gen);
     } else {
-      log.info("NaNS, writing {}", namespace.getValue());
+      log.info("NaNS, writing to mongo {}", namespace.getValue());
       gen.writeObject(namespace.getValue());
     }
   }
