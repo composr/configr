@@ -1,8 +1,5 @@
 name: mongo-deploy
-on:
-  push:
-    branches-ignore:
-      - '**'
+on: [workflow_dispatch]
 
 jobs:
   build-and-deploy:
