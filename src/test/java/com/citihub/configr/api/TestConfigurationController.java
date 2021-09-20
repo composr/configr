@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.mongodb.client.MongoClient;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -21,6 +22,9 @@ public class TestConfigurationController {
   @Autowired
   private MockMvc mockMvc;
 
+  @MockBean
+  private MongoClient mongoClient;
+  
   @MockBean
   private MongoNamespaceQueries nsQueries;
   
