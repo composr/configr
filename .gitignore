@@ -22,3 +22,6 @@ local.properties
 *.class
 *.log
 
+/configr.iml
+/.idea/
+.DS_Store
