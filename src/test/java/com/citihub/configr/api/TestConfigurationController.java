@@ -23,11 +23,18 @@ public class TestConfigurationController {
   private MockMvc mockMvc;
 
   @MockBean
+  /**
+   * You may have success locally removing this but you will have
+   * a bad time in GitLab CI land, so don't remove please.
+   */
   private MongoClient mongoClient;
-
+  
   @MockBean
   private MongoNamespaceQueries nsQueries;
-
+  
+  @MockBean
+  private ConfigurationService configurationService;
+  
   @Test
   public void testNotFound() throws Exception {
     mockMvc.perform(get("/foo/bar/baz")).andDo(print()).andExpect(status().isNotFound());
@@ -39,8 +46,8 @@ public class TestConfigurationController {
   }
 
   @Test
-  public void testGetValid() throws Exception {
+  public void testGetFound() throws Exception {
     mockMvc.perform(get("/configuration/x")).andDo(print()).andExpect(status().isOk());
   }
-
+  
 }

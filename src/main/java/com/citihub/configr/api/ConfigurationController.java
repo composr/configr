@@ -23,9 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(path = "/configuration")
 public class ConfigurationController {
 
-  @Autowired
   private ConfigurationService configurationService;
 
+  private ObjectMapper objectMapper;
+  
+  public ConfigurationController(@Autowired ConfigurationService configurationService,
+      @Autowired ObjectMapper objectMapper) {
+    this.configurationService = configurationService;
+    this.objectMapper = objectMapper;
+  }
+  
   @GetMapping(path = "/**")
   public @ResponseBody Namespace getData(HttpServletRequest request, HttpServletResponse response) {
     log.info("You asked for: " + request.getRequestURI());
@@ -33,10 +40,9 @@ public class ConfigurationController {
         (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
     log.info("You asked for: " + fullPath);
 
-    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
-      // TODO: if fetchNamespace is null, return 404
+    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI())) {
       return wrapResponseNS(configurationService.fetchNamespace(fullPath));
-    else
+    } else
       throw new BadURIException();
   }
 
@@ -46,7 +52,7 @@ public class ConfigurationController {
       HttpServletResponse response) throws IOException {
     log.info("You asked for me to put: " + json + " to the namespace " + request.getRequestURI());
 
-    JsonParser p = new ObjectMapper().createParser(json);
+    JsonParser p = objectMapper.createParser(json);
 
     if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
       return wrapResponseNS(configurationService.storeNamespace(p, request.getRequestURI()));
@@ -55,7 +61,8 @@ public class ConfigurationController {
   }
 
   private Namespace wrapResponseNS(Namespace ns) {
-    return ns == null ? null : new Namespace("", Collections.singletonMap(ns.getKey(), ns));
+    return ns == null ? null : new Namespace(
+        "", Collections.singletonMap(ns.getKey(), ns));
   }
 
 
