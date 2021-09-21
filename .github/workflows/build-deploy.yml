@@ -1,7 +1,7 @@
 name: build-deploy
 on:
-  push:
-    branches: [ develop ]
+  #push:
+  #  branches: [ develop ]
   workflow_run:
     workflows: [ "build-test" ]
     branches: [ develop ]
@@ -19,7 +19,7 @@ jobs:
           java-version: '16'
           distribution: 'adopt'
       - name: Build with Maven
-        run: mvn package spring-boot:repackage
+        run: mvn -Dmaven.test.skip=true package spring-boot:repackage
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
@@ -43,6 +43,7 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           ports: 8080
-          secure-environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
+          environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
+          #secure-environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
           name: configr-dev
           location: 'east us 2'
