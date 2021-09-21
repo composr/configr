@@ -1,15 +1,20 @@
 package com.citihub.configr.mongostorage;
 
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import com.citihub.configr.namespace.Namespace;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class MongoNamespaceQueries {
 
@@ -32,8 +37,23 @@ public class MongoNamespaceQueries {
       return null; // Nothing found
   }
 
-  // public Namespace save(Namespace namespace) {
-  // mongoTemplate.save(namespace.getVersion());
-  // mongoTemplate.save(namespace);
-  // }
+  @PostConstruct
+  public void postConstruct() {
+    log.info("Ensuring indexes are set.");
+    try {
+      ensureIndexes(mongoTemplate);
+    } catch (NullPointerException e) {
+      log.error("DB is null - expected during test runs but this is a "
+          + "horrible hack.");
+    }
+  }
+ 
+  private void ensureIndexes(MongoTemplate mongoTemplate) {
+    TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()
+        .onField("_id")
+        .build();
+
+    mongoTemplate.indexOps(Namespace.class).ensureIndex(textIndex);
+  }
+  
 }
