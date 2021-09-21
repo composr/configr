@@ -1,7 +1,7 @@
 name: build-deploy
 on:
-  push:
-    branches: [ develop ]
+  #push:
+  #  branches: [ develop ]
   workflow_run:
     workflows: [ "build-test" ]
     branches: [ develop ]
@@ -43,6 +43,7 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           ports: 8080
-          secure-environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
+          environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
+          #secure-environment-variables: MONGODB_URI=mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017?authSource=admin&readPreference=primary&appname=configr&ssl=false
           name: configr-dev
           location: 'east us 2'
