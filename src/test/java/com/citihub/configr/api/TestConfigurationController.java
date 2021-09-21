@@ -23,6 +23,10 @@ public class TestConfigurationController {
   private MockMvc mockMvc;
 
   @MockBean
+  /**
+   * You may have success locally removing this but you will have
+   * a bad time in GitLab CI land, so don't remove please.
+   */
   private MongoClient mongoClient;
   
   @MockBean
