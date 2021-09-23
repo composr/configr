@@ -6,12 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.annotation.JsonKey;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
 @Document
+@JsonSerialize(using=NamespaceSerializer.class)
 public class Namespace {
 
   private Metadata metadata;

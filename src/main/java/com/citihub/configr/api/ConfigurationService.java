@@ -1,7 +1,10 @@
 package com.citihub.configr.api;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -11,12 +14,9 @@ import com.citihub.configr.mongostorage.MongoNamespaceQueries;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,16 +27,16 @@ public class ConfigurationService {
 
   private MongoConfigRepository configRepo;
 
-  private ObjectMapper mongoObjectMapper;
+  private ObjectMapper objectMapper;
 
   private final int LEADING_SLASH_IDX = 1;
 
   public ConfigurationService(@Autowired MongoConfigRepository configRepo,
       @Autowired MongoNamespaceQueries nsQueries, 
-      @Autowired ObjectMapper mongoObjectMapper) {
+      @Autowired ObjectMapper objectMapper) {
     this.configRepo = configRepo;
     this.nsQueries = nsQueries;
-    this.mongoObjectMapper = mongoObjectMapper;
+    this.objectMapper = objectMapper;
   }
 
   public @NonNull Namespace fetchNamespace(String fullPath) {
@@ -47,48 +47,80 @@ public class ConfigurationService {
     return ns;
   }
 
-  public Namespace storeNamespace(JsonParser p, String path)
+  public @NonNull Map<String, Object> fetchNamespaceBodyByPath(String fullPath) {
+    Namespace ns = nsQueries.findByPath(trimPath(fullPath));
+    if( ns == null )
+      throw new NotFoundException();
+    log.info("using path {}, I found: {}", trimPath(fullPath), ns);
+    
+    if( ns.getValue() instanceof Map ) {
+      Map<String, Object> result = (Map<String, Object>)ns.getValue();
+
+      String [] split = trimPath(fullPath).split("/");
+      for( int i = 1; i < split.length-1; i++ ) {
+        log.info("Removing key {}", split[i]);
+        result = (Map<String, Object>)result.remove(split[i]);
+      }
+      
+      return result;
+    } else
+      return Collections.singletonMap(ns.getKey(), ns.getValue());
+  }
+  
+  public Namespace storeNamespace(Map<String, Object> json, String path)
       throws JsonMappingException, JsonParseException, IOException {
 
-    JsonNode jsonTree = materialize(trimPath(path), p);
+    Namespace materialized = materialize(json, trimPath(path));
+    Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
+    if( extant.isPresent() ) {
+      merge((Map<String, Object>)extant.get().getValue(), 
+          (Map<String, Object>)materialized.getValue());
 
-    Namespace rootNamespace = mongoObjectMapper.convertValue(jsonTree, Namespace.class);
-
-    // always save the namespace value, not the wrapper itself
-    if (rootNamespace.getVersion() == null)
-      rootNamespace.setVersion(new Version(""));
-    return configRepo.save(getNamespaceFromValueUnsafe(rootNamespace));
+      String newHash = Hashing.sha256().hashString(
+          objectMapper.writeValueAsString(extant.get().getValue())).toString();
+      if( !extant.get().getVersion().getId().equals(newHash)) {
+        extant.get().setVersion(new Version(newHash));
+        log.info("Going to save {} to mongo", objectMapper.writeValueAsString(extant.get()));
+        return configRepo.save(extant.get());
+      } else
+        return extant.get();
+    } else {
+      String newHash = Hashing.sha256().hashString(
+          objectMapper.writeValueAsString(materialized.getValue())).toString();
+      materialized.setVersion(new Version(
+          Hashing.sha256().hashString(newHash).toString()));
+      return configRepo.save(materialized);
+    }
   }
 
-  private JsonNode materialize(String path, JsonParser p) throws IOException {
+  private Namespace materialize(Map<String, Object> json, String path) {
     String[] pathTokens = path.split("/");
 
-    JsonNode curRoot = p.getCodec().readTree(p);
+    Map<String, Object> curRoot = json;
 
     // Intentionally ignore the root of the URI, i.e. config, version, metadata
     for (int i = pathTokens.length - 1; i > 0; i--) {
       log.info("Creating representation for path token {}", pathTokens[i]);
-      ObjectNode foo = JsonNodeFactory.instance.objectNode();
-      foo.set(pathTokens[i], curRoot);
-      curRoot = foo;
+      Map<String, Object> newNodes = new HashMap<>();
+      newNodes.put(pathTokens[i], curRoot);
+      curRoot = newNodes;
     }
 
-    return curRoot;
-  }
-
-  /**
-   * Can be used when the rootNamespace is built with NamespaceDeserializer. The root will contain a
-   * value that is a Map<String, Namespace> with a single entry. No type checking is done in this
-   * method, hence unsafe.
-   * 
-   * @param rootNamespace
-   * @return Namespace in the map
-   */
-  Namespace getNamespaceFromValueUnsafe(Namespace rootNamespace) {
-    return ((Map<String, Namespace>) rootNamespace.getValue()).values().iterator().next();
+    return new Namespace(pathTokens[1], curRoot, "/" + pathTokens[1]);
   }
 
   String trimPath(String fullPath) {
     return fullPath.substring(fullPath.indexOf('/', LEADING_SLASH_IDX));
   }
+
+  private void merge(Map<String, Object> mapExtant, Map<String, Object> mapNew) {
+    for (String key : mapNew.keySet()) {
+      if (mapExtant.containsKey(key) && mapExtant.get(key) instanceof Map) {
+        merge((Map<String, Object>)mapExtant.get(key), 
+              (Map<String, Object>)mapNew.get(key));
+      } else
+        mapExtant.put(key, mapNew.get(key));
+    }
+  }
+
 }

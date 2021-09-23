@@ -26,10 +26,12 @@ public class MongoNamespaceDeserializer extends JsonDeserializer<Namespace> {
   public Namespace deserialize(JsonParser p, DeserializationContext ctxt)
       throws IOException, JsonProcessingException {
     JsonNode node = p.getCodec().readTree(p);
+    
+    Entry<String, JsonNode> entry = node.fields().next();
 
-    Namespace parent = new Namespace();
-    parent.setValue(deserializeNode(node, parent));
-    return parent;
+    Namespace ns = new Namespace(entry.getKey(), null, "/" + entry.getKey());
+
+    return ns;
   }
 
   private Object deserializeNode(JsonNode node, Namespace parent) throws JsonProcessingException {

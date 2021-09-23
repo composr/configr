@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import com.citihub.configr.namespace.Namespace;
@@ -25,6 +27,14 @@ public class MongoNamespaceQueries {
   }
 
   public Namespace findByPath(String path) {
+    String whereClause = "value" + path.replaceAll("\\/", "\\.");
+    
+    Query query = new Query();
+    query.addCriteria(Criteria.where(whereClause).exists(true));
+    return mongoTemplate.findOne(query, Namespace.class);
+  }
+  
+  private Namespace findByTextMatch(String path) {
     MatchOperation filterNamespace =
         Aggregation.match(TextCriteria.forDefaultLanguage().matching(path));
 

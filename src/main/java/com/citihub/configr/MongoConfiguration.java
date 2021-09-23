@@ -5,11 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
-import com.citihub.configr.mongostorage.MongoNamespaceDeserializer;
-import com.citihub.configr.mongostorage.MongoNamespaceSerializer;
-import com.citihub.configr.namespace.Namespace;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Strings;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoCredential;
@@ -43,19 +38,5 @@ public class MongoConfiguration {
            MongoCredential.createCredential(username, db, password.toCharArray()) } );
        return mongo;
   }
-  
-  public @Bean({"objectMapper"}) ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.findAndRegisterModules();
-
-    SimpleModule module = new SimpleModule();
-    module.addSerializer(Namespace.class, new MongoNamespaceSerializer());
-    module.addDeserializer(Namespace.class, new MongoNamespaceDeserializer());
-    mapper.registerModule(module);
-
-    return mapper;
-  }
-  
-
-  
+    
 }
