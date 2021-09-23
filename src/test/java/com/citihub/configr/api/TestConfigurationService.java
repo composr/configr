@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class TestConfigurationService {
@@ -29,6 +30,15 @@ public class TestConfigurationService {
   private final String MERGE_LEFT_SAMPLE = "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}}";
   private final String MERGE_RIGHT_SAMPLE = "{\"x\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
   
+  private final String REPLACE_ROOT_SAMPLE = "{\"x\":{\"z\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
+  private final String REPLACE_SMALL_SAMPLE = "{\"x\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}";
+
+  private final String REPLACE_PRIMITIVE_SAMPLE = "{\"x\":{\"a\":{\"f\":{\"boo\":{\"fooz\":{\"foo\": [\"ball\",\"bazz\"]}}}}}}";
+  private final String REPLACE_PRIMITIVE_RESULT = "{\"x\":{\"a\":{\"f\":{\"boo\":{\"fooz\":{\"foo\":[\"ball\",\"bazz\"]}}}}}}";
+  
+  private final String REPLACE_NULL_OBJECT_RIGHT = "{\"x\":{\"z\":{\"heythere\":{\"toast\":{\"boo\":\"fooz\"}}}}}";
+  private final String REPLACE_NULL_OBJECT_RESULT = "{\"x\":{\"a\":{\"f\":{\"boo\":\"fooz\"}},\"z\":{\"heythere\":{\"toast\":{\"boo\":\"fooz\"}}}}}";
+
   
   @Mock
   private MongoConfigRepository configRepo;
@@ -38,11 +48,6 @@ public class TestConfigurationService {
   
   @InjectMocks
   private ConfigurationService configService;
-
-  @Test
-  public void testTrimPath() {
-    assertThat(configService.trimPath("/configuration/x/y/z")).isEqualTo("/x/y/z");
-  }
   
   @Test
   public void testfindNamespaceOrThrowException() {
@@ -65,7 +70,8 @@ public class TestConfigurationService {
     Map<String, Object> jsonMap = new ObjectMapper().readValue(TEST_JSON, 
         new HashMap<String, Object>().getClass());
     
-    Map<String, Object> result = configService.trimPathFromResponse("/configuration/x/y/a/f/boo/fooz", jsonMap);
+    Map<String, Object> result = configService.trimKeysFromResponseMap(
+        new String[] { "x", "y", "a", "f", "boo", "fooz"}, jsonMap);
     
     assertThat(result.keySet().size() == 1 );
     assertThat(result.keySet().iterator().next().equals("fooz"));
@@ -77,10 +83,50 @@ public class TestConfigurationService {
     Map<String, Object> jsonMap = new ObjectMapper().readValue(TEST_JSON, 
         new HashMap<String, Object>().getClass());
     
-    Map<String, Object> result = configService.trimPathFromResponse("/configuration/x/y", jsonMap);
+    Map<String, Object> result = configService.trimKeysFromResponseMap(new String[] { "x", "y"}, jsonMap);
     log.info(new ObjectMapper().writeValueAsString(result));
     assertThat(result.keySet().size()).isEqualTo(1);
     assertThat(result.keySet().iterator().next().equals("y"));
   }
 
+  @Test
+  public void testShouldReplaceRoot() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
+    
+    configService.replace(left, right, new String[] { "x" });
+    assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_ROOT_SAMPLE);
+  }
+  
+  @Test
+  public void testShouldReplaceObject() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
+    
+    configService.replace(left, right, new String[] { "x", "z", "y" });
+    assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_ROOT_SAMPLE);
+  }
+  
+  @Test
+  public void testShouldInsertBranch() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(REPLACE_SMALL_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_NULL_OBJECT_RIGHT, new HashMap<>().getClass());
+    
+    configService.replace(left, right, new String[] { "x", "z", "heythere", "toast" });
+    log.info("ladi da {}", mapper.writeValueAsString(left));
+    assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_NULL_OBJECT_RESULT);
+  }
+  
+  @Test
+  public void testShouldReplacePrimitive() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(REPLACE_SMALL_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_PRIMITIVE_SAMPLE, new HashMap<>().getClass());
+    
+    configService.replace(left, right, new String[] { "x", "a", "f", "boo", "fooz" });
+    assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_PRIMITIVE_RESULT);
+  }
 }
