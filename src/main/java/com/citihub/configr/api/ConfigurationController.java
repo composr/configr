@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,9 +55,22 @@ public class ConfigurationController {
     log.info("You asked for me to put: " + json + " to the namespace " + request.getRequestURI());
 
     if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
-      return configurationService.storeNamespace(json, request.getRequestURI());
+      return configurationService.storeNamespace(json, request.getRequestURI(), true);
     else
       throw new BadURIException();
   }
 
+  @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
+      value = "/**")
+  public @ResponseBody Namespace patchWithData(
+      @RequestBody Map<String, Object> json, 
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
+    log.info("You asked for me to put: " + json + " to the namespace " + request.getRequestURI());
+
+    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
+      return configurationService.storeNamespace(json, request.getRequestURI(), true);
+    else
+      throw new BadURIException();
+  }
+  
 }
