@@ -9,13 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.HandlerMapping;
-import com.citihub.configr.exception.BadURIException;
 import com.citihub.configr.namespace.Namespace;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,27 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ConfigurationController {
 
   private ConfigurationService configurationService;
-
-  private ObjectMapper objectMapper;
   
-  public ConfigurationController(@Autowired ConfigurationService configurationService,
-      @Autowired ObjectMapper objectMapper) {
+  public ConfigurationController(@Autowired ConfigurationService configurationService) {
     this.configurationService = configurationService;
-    this.objectMapper = objectMapper;
   }
   
   @GetMapping(path = "/**")
   public @ResponseBody Map<String, Object> getData(
       HttpServletRequest request, HttpServletResponse response) {
-    log.info("You asked for: " + request.getRequestURI());
-    String fullPath =
-        (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-    log.info("You asked for: " + fullPath);
-
-    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI())) {
-      return configurationService.fetchNamespaceBodyByPath(fullPath);
-    } else
-      throw new BadURIException();
+    return configurationService.fetchNamespaceBodyByPath(getTrimmedPath(request));
   }
 
   @PostMapping(consumes = {"application/json", "application/yaml", "application/yml"},
@@ -52,25 +38,33 @@ public class ConfigurationController {
   public @ResponseBody Namespace postData(
       @RequestBody Map<String, Object> json, 
       HttpServletRequest request, HttpServletResponse response) throws IOException {
-    log.info("You asked for me to put: " + json + " to the namespace " + request.getRequestURI());
+    log.info("You asked for me to POST: " + json + " to the namespace " + request.getRequestURI());
 
-    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
-      return configurationService.storeNamespace(json, request.getRequestURI(), true);
-    else
-      throw new BadURIException();
+    return configurationService.storeNamespace(json, getTrimmedPath(request), false);
   }
 
+  @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"},
+      value = "/**")
+  public @ResponseBody Namespace putData(
+      @RequestBody Map<String, Object> json, 
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
+    log.info("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
+
+    return configurationService.storeNamespace(json, getTrimmedPath(request), false);
+  }
+  
   @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
       value = "/**")
   public @ResponseBody Namespace patchWithData(
       @RequestBody Map<String, Object> json, 
       HttpServletRequest request, HttpServletResponse response) throws IOException {
-    log.info("You asked for me to put: " + json + " to the namespace " + request.getRequestURI());
+    log.info("You asked for me to PATCH: " + json + " to the namespace " + request.getRequestURI());
 
-    if (ConfigurationRequestValidation.isRequestURIAValidNamespace(request.getRequestURI()))
-      return configurationService.storeNamespace(json, request.getRequestURI(), true);
-    else
-      throw new BadURIException();
+    return configurationService.storeNamespace(json, getTrimmedPath(request), true);
   }
-  
+
+  String getTrimmedPath(HttpServletRequest request) {
+    return request.getRequestURI().replace("/configuration", "");
+  }
+    
 }
