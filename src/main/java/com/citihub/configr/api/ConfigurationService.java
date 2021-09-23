@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.Hashing;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,41 +41,43 @@ public class ConfigurationService {
   }
 
   public @NonNull Namespace fetchNamespace(String fullPath) {
-    Namespace ns = nsQueries.findByPath(trimPath(fullPath));
-    if( ns == null )
-      throw new NotFoundException();
+    Namespace ns = findNamespaceOrThrowException(fullPath);
     log.info("using path {}, I found: {}", trimPath(fullPath), ns);
     return ns;
   }
 
   public @NonNull Map<String, Object> fetchNamespaceBodyByPath(String fullPath) {
-    Namespace ns = nsQueries.findByPath(trimPath(fullPath));
-    if( ns == null )
-      throw new NotFoundException();
+    Namespace ns = findNamespaceOrThrowException(fullPath);
     log.info("using path {}, I found: {}", trimPath(fullPath), ns);
     
     if( ns.getValue() instanceof Map ) {
-      Map<String, Object> result = (Map<String, Object>)ns.getValue();
-
-      String [] split = trimPath(fullPath).split("/");
-      for( int i = 1; i < split.length-1; i++ ) {
-        log.info("Removing key {}", split[i]);
-        result = (Map<String, Object>)result.remove(split[i]);
-      }
-      
-      return result;
+      return trimPathFromResponse(fullPath, (Map<String, Object>)ns.getValue());
     } else
       return Collections.singletonMap(ns.getKey(), ns.getValue());
   }
+
+  Map<String, Object> trimPathFromResponse(String fullPath, Map<String, Object> result) {
+    log.info("using path {}", trimPath(fullPath));
+    String [] split = trimPath(fullPath).split("/");
+    for( int i = 1; i < split.length-1; i++ ) {
+      log.info("Removing key {}", split[i]);
+      result = (Map<String, Object>)result.remove(split[i]);
+    }
+
+    result.keySet().removeIf(id -> !id.equals(split[split.length-1]));      
+    return result;
+  }
   
-  public Namespace storeNamespace(Map<String, Object> json, String path)
+  public Namespace storeNamespace(Map<String, Object> json, String path, boolean mergeTrees)
       throws JsonMappingException, JsonParseException, IOException {
 
     Namespace materialized = materialize(json, trimPath(path));
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if( extant.isPresent() ) {
-      merge((Map<String, Object>)extant.get().getValue(), 
-          (Map<String, Object>)materialized.getValue());
+
+      if( mergeTrees )
+        merge((Map<String, Object>)extant.get().getValue(), 
+            (Map<String, Object>)materialized.getValue());
 
       String newHash = Hashing.sha256().hashString(
           objectMapper.writeValueAsString(extant.get().getValue())).toString();
@@ -93,7 +96,7 @@ public class ConfigurationService {
     }
   }
 
-  private Namespace materialize(Map<String, Object> json, String path) {
+  Namespace materialize(Map<String, Object> json, String path) {
     String[] pathTokens = path.split("/");
 
     Map<String, Object> curRoot = json;
@@ -113,7 +116,14 @@ public class ConfigurationService {
     return fullPath.substring(fullPath.indexOf('/', LEADING_SLASH_IDX));
   }
 
-  private void merge(Map<String, Object> mapExtant, Map<String, Object> mapNew) {
+  Namespace findNamespaceOrThrowException(String fullPath) {
+    Namespace ns = nsQueries.findByPath(trimPath(fullPath));
+    if( ns == null )
+      throw new NotFoundException();
+    return ns;
+  }
+  
+  void merge(Map<String, Object> mapExtant, Map<String, Object> mapNew) {
     for (String key : mapNew.keySet()) {
       if (mapExtant.containsKey(key) && mapExtant.get(key) instanceof Map) {
         merge((Map<String, Object>)mapExtant.get(key), 
