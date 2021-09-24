@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;

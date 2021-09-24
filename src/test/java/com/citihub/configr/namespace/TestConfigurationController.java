@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.namespace.NamespaceController;
+import com.citihub.configr.namespace.NamespaceService;
 import com.mongodb.client.MongoClient;
 
 @Tag("unit")
@@ -28,14 +30,10 @@ import com.mongodb.client.MongoClient;
 public class TestConfigurationController {
 
   @MockBean
-  private ConfigurationService configurationService;
+  private NamespaceService configurationService;
   
   @InjectMocks
-  private ConfigurationController configController;
-  
-  @BeforeAll
-  public void setup() {
-  }
+  private NamespaceController configController;
   
   @Test
   public void testTrimPath() {

@@ -1,3 +1,6 @@
+springdoc:
+  packagesToScan: com.citihub.configr.namespace, com.citihub.configr.version
+  pathsToMatch: /**
 mongodb:
   uri: mongodb://localhost:27017/?ssl=false
   db: configr

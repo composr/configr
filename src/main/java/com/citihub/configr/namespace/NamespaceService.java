@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -12,7 +12,6 @@ import com.citihub.configr.exception.ConflictException;
 import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
-import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ConfigurationService {
+public class NamespaceService {
 
   private MongoNamespaceQueries nsQueries;
 
@@ -31,7 +30,7 @@ public class ConfigurationService {
 
   private ObjectMapper objectMapper;
 
-  public ConfigurationService(@Autowired MongoConfigRepository configRepo,
+  public NamespaceService(@Autowired MongoConfigRepository configRepo,
       @Autowired MongoNamespaceQueries nsQueries, 
       @Autowired ObjectMapper objectMapper) {
     this.configRepo = configRepo;
@@ -74,19 +73,16 @@ public class ConfigurationService {
     Namespace materialized = materialize(json, split(path));
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if( extant.isPresent() ) {
-      return saveWithExtant(materialized, extant.get(), split(path), 
+      return mergeReplaceSave(materialized, extant.get(), split(path), 
           shouldMerge, shouldReplace);
     } else {
-      String newHash = Hashing.sha256().hashString(
-          objectMapper.writeValueAsString(materialized.getValue())).toString();
-      materialized.setVersion(new Version(
-          Hashing.sha256().hashString(newHash).toString()));
-      return configRepo.save(materialized);
+      return versionAndSave(materialized, hashNamespace(materialized));
     }
   }
 
-  private Namespace saveWithExtant(Namespace materialized, Namespace extant,
+  private Namespace mergeReplaceSave(Namespace materialized, Namespace extant,
       String [] path, boolean shouldMergeTrees, boolean shouldReplace) throws JsonProcessingException {
+    String oldHash = hashNamespace(extant);
     if( shouldMergeTrees )
       merge((Map<String, Object>)extant.getValue(), 
           (Map<String, Object>)materialized.getValue());
@@ -100,18 +96,25 @@ public class ConfigurationService {
           (Map<String, Object>)materialized.getValue(), path);
     }
     
-    String newHash = Hashing.sha256().hashString(
-        objectMapper.writeValueAsString(extant.getValue())).toString();
-    if( isHashMatches(extant, newHash)) {
-      extant.setVersion(new Version(newHash));
-      log.info("Going to save {} to mongo", objectMapper.writeValueAsString(extant));
-      return configRepo.save(extant);
+    return compareAndSaveNamespace(extant, oldHash);
+  }
+
+  private Namespace compareAndSaveNamespace(Namespace extant, String oldHash) throws JsonProcessingException {
+    String newHash = hashNamespace(extant);
+    if(!oldHash.equals(newHash)) {
+      return versionAndSave(extant, newHash);
     } else
       return extant;
   }
 
-  private boolean isHashMatches(Namespace extant, String newHash) {
-    return !extant.getVersion().getId().equals(newHash);
+  private Namespace versionAndSave(Namespace ns, String newHash) {
+    ns.setVersion(new Version(newHash));
+    return configRepo.save(ns);
+  }
+
+  private String hashNamespace(Namespace extant) throws JsonProcessingException {
+    return Hashing.sha256().hashString(
+        objectMapper.writeValueAsString(extant.getValue())).toString();
   }
 
   String [] split(String fullPath) {

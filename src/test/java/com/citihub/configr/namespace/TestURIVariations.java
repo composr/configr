@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.namespace.NamespaceService;
 import com.mongodb.client.MongoClient;
 
 @SpringBootTest
@@ -35,7 +36,7 @@ public class TestURIVariations {
   private MongoNamespaceQueries nsQueries;
   
   @MockBean
-  private ConfigurationService configurationService;
+  private NamespaceService configurationService;
   
   @Test
   public void testNotFound() throws Exception {
