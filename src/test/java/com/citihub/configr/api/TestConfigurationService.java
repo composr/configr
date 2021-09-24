@@ -129,4 +129,48 @@ public class TestConfigurationService {
     configService.replace(left, right, new String[] { "x", "a", "f", "boo", "fooz" });
     assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_PRIMITIVE_RESULT);
   }
+  
+  @Test
+  public void testWouldReplacePrimitive() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(REPLACE_SMALL_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_PRIMITIVE_SAMPLE, new HashMap<>().getClass());
+    
+    boolean result = configService.wouldReplace(left, right, 
+        new String[] { "x", "a", "f", "boo", "fooz" });
+    assertThat(result).isTrue();
+  }
+  
+  @Test
+  public void testWouldReplaceObject() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
+    
+    boolean result = configService.wouldReplace(left, right, 
+        new String[] { "x", "z", "y" });
+    assertThat(result).isTrue();
+  }
+  
+  @Test
+  public void testWouldReplaceRoot() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
+    
+    boolean result = configService.wouldReplace(left, right, 
+        new String[] { "x" });
+    assertThat(result).isTrue();
+  }
+  
+  @Test
+  public void testWouldNotReplace() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(REPLACE_SMALL_SAMPLE, new HashMap<>().getClass());
+    Map<String, Object> right = mapper.readValue(REPLACE_NULL_OBJECT_RIGHT, new HashMap<>().getClass());
+    
+    boolean result = configService.wouldReplace(left, right, 
+        new String[] { "x", "z", "heythere", "toast" });
+    assertThat(result).isFalse();
+  }
 }
