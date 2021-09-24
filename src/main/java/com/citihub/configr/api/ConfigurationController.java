@@ -40,7 +40,7 @@ public class ConfigurationController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to POST: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), false);
+    return configurationService.storeNamespace(json, getTrimmedPath(request), false, false);
   }
 
   @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"},
@@ -50,7 +50,7 @@ public class ConfigurationController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), false);
+    return configurationService.storeNamespace(json, getTrimmedPath(request), false, true);
   }
   
   @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
@@ -60,7 +60,7 @@ public class ConfigurationController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PATCH: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), true);
+    return configurationService.storeNamespace(json, getTrimmedPath(request), true, true);
   }
 
   String getTrimmedPath(HttpServletRequest request) {
