@@ -1,4 +1,4 @@
-package com.citihub.configr.namespace;
+package com.citihub.configr.metadata;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

@@ -3,6 +3,7 @@ package com.citihub.configr.namespace;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.citihub.configr.metadata.Metadata;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.annotation.JsonKey;
 import com.fasterxml.jackson.annotation.JsonValue;

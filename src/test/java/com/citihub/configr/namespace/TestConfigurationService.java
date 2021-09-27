@@ -1,4 +1,4 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.namespace.NamespaceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +48,7 @@ public class TestConfigurationService {
   private MongoNamespaceQueries nsQueries;
   
   @InjectMocks
-  private ConfigurationService configService;
+  private NamespaceService configService;
   
   @Test
   public void testfindNamespaceOrThrowException() {

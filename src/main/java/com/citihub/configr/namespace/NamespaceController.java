@@ -1,10 +1,11 @@
-package com.citihub.configr.api;
+package com.citihub.configr.namespace;
 
 import java.io.IOException;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,28 +14,27 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.citihub.configr.namespace.Namespace;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 @RequestMapping(path = "/configuration")
-public class ConfigurationController {
+public class NamespaceController {
 
-  private ConfigurationService configurationService;
+  private NamespaceService configurationService;
   
-  public ConfigurationController(@Autowired ConfigurationService configurationService) {
+  public NamespaceController(@Autowired NamespaceService configurationService) {
     this.configurationService = configurationService;
   }
   
-  @GetMapping(path = "/**")
+  @GetMapping(path = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
   public @ResponseBody Map<String, Object> getData(
       HttpServletRequest request, HttpServletResponse response) {
     return configurationService.fetchNamespaceBodyByPath(getTrimmedPath(request));
   }
 
   @PostMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**")
+      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
   public @ResponseBody Namespace postData(
       @RequestBody Map<String, Object> json, 
       HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -44,7 +44,7 @@ public class ConfigurationController {
   }
 
   @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**")
+      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
   public @ResponseBody Namespace putData(
       @RequestBody Map<String, Object> json, 
       HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -54,7 +54,7 @@ public class ConfigurationController {
   }
   
   @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**")
+      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
   public @ResponseBody Namespace patchWithData(
       @RequestBody Map<String, Object> json, 
       HttpServletRequest request, HttpServletResponse response) throws IOException {
