@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import com.citihub.configr.exception.NotFoundException;
-import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.Namespace;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class VersionService {
 
-  private MongoNamespaceQueries nsQueries;
+  private MongoOperations nsQueries;
 
-  public VersionService(@Autowired MongoNamespaceQueries nsQueries) {
+  public VersionService(@Autowired MongoOperations nsQueries) {
     this.nsQueries = nsQueries;
   }
 

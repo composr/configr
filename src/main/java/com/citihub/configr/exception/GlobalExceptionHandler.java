@@ -24,6 +24,13 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseEntity<String> handleSaveFailureException(SaveFailureException ex) {
+    return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  
+  @ExceptionHandler
   @ResponseStatus(HttpStatus.CONFLICT)
   public ResponseEntity<String> handleJsonMappingException(ConflictException ex) {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.CONFLICT);
