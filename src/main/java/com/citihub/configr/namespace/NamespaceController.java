@@ -22,41 +22,38 @@ import lombok.extern.slf4j.Slf4j;
 public class NamespaceController {
 
   private NamespaceService configurationService;
-  
+
   public NamespaceController(@Autowired NamespaceService configurationService) {
     this.configurationService = configurationService;
   }
-  
-  @GetMapping(path = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
-  public @ResponseBody Map<String, Object> getData(
-      HttpServletRequest request, HttpServletResponse response) {
+
+  @GetMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public @ResponseBody Map<String, Object> getData(HttpServletRequest request,
+      HttpServletResponse response) {
     return configurationService.fetchNamespaceBodyByPath(getTrimmedPath(request));
   }
 
   @PostMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
-  public @ResponseBody Namespace postData(
-      @RequestBody Map<String, Object> json, 
+      value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public @ResponseBody Namespace postData(@RequestBody Map<String, Object> json,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to POST: " + json + " to the namespace " + request.getRequestURI());
 
     return configurationService.storeNamespace(json, getTrimmedPath(request), false, false);
   }
 
-  @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
-  public @ResponseBody Namespace putData(
-      @RequestBody Map<String, Object> json, 
+  @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"}, value = "/**",
+      produces = {MediaType.APPLICATION_JSON_VALUE})
+  public @ResponseBody Namespace putData(@RequestBody Map<String, Object> json,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
 
     return configurationService.storeNamespace(json, getTrimmedPath(request), false, true);
   }
-  
+
   @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
-      value = "/**", produces = { MediaType.APPLICATION_JSON_VALUE })
-  public @ResponseBody Namespace patchWithData(
-      @RequestBody Map<String, Object> json, 
+      value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public @ResponseBody Namespace patchWithData(@RequestBody Map<String, Object> json,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PATCH: " + json + " to the namespace " + request.getRequestURI());
 
@@ -66,5 +63,5 @@ public class NamespaceController {
   String getTrimmedPath(HttpServletRequest request) {
     return request.getRequestURI().replace("/configuration", "");
   }
-    
+
 }

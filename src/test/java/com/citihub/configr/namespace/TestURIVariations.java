@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoOperations;
-import com.citihub.configr.namespace.NamespaceService;
 import com.mongodb.client.MongoClient;
 
 @SpringBootTest
@@ -27,17 +26,17 @@ public class TestURIVariations {
 
   @MockBean
   /**
-   * You may have success locally removing this but you will have
-   * a bad time in GitLab CI land, so don't remove please.
+   * You may have success locally removing this but you will have a bad time in GitLab CI land, so
+   * don't remove please.
    */
   private MongoClient mongoClient;
-  
+
   @MockBean
   private MongoOperations nsQueries;
-  
+
   @MockBean
   private NamespaceService configurationService;
-  
+
   @Test
   public void testNotFound() throws Exception {
     mockMvc.perform(get("/foo/bar/baz")).andDo(print()).andExpect(status().isNotFound());
@@ -52,5 +51,5 @@ public class TestURIVariations {
   public void testGetFound() throws Exception {
     mockMvc.perform(get("/configuration/x")).andDo(print()).andExpect(status().isOk());
   }
-  
+
 }

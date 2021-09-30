@@ -38,8 +38,7 @@ public class TestNamespaceSerializer {
   @Test
   public void testDeserializeTrivialNamespace()
       throws JsonMappingException, JsonProcessingException {
-    Map<String, Object> value = mapper.readValue(TRIVIAL_JSON_SAMPLE, 
-        new HashMap<>().getClass());
+    Map<String, Object> value = mapper.readValue(TRIVIAL_JSON_SAMPLE, new HashMap<>().getClass());
     Namespace namespace = new Namespace("foo", value);
     log.info("{}", mapper.writeValueAsString(namespace));
     assertThat(mapper.writeValueAsString(namespace))
@@ -49,8 +48,8 @@ public class TestNamespaceSerializer {
   @Test
   public void testDeserializeComplexNamespace()
       throws JsonMappingException, JsonProcessingException {
-    Map<String, Object> value = mapper.readValue(MEDIUM_COMPLEX_JSON_SAMPLE, 
-        new HashMap<>().getClass());
+    Map<String, Object> value =
+        mapper.readValue(MEDIUM_COMPLEX_JSON_SAMPLE, new HashMap<>().getClass());
     Namespace namespace = new Namespace("foo", value);
     log.info("{}", mapper.writeValueAsString(namespace));
     log.info("...and a namespace of {}", namespace.getNamespace());

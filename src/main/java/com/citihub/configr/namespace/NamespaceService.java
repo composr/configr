@@ -31,8 +31,7 @@ public class NamespaceService {
   private ObjectMapper objectMapper;
 
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
-      @Autowired MongoOperations nsQueries, 
-      @Autowired ObjectMapper objectMapper) {
+      @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper) {
     this.configRepo = configRepo;
     this.nsQueries = nsQueries;
     this.objectMapper = objectMapper;
@@ -48,62 +47,60 @@ public class NamespaceService {
     Namespace ns = findNamespaceOrThrowException(fullPath);
     log.info("using path {}, I found: {}", split(fullPath), ns);
 
-    if( ns.getValue() instanceof Map ) {
-      return trimKeysFromResponseMap(split(fullPath), 
-          (Map<String, Object>)ns.getValue());
+    if (ns.getValue() instanceof Map) {
+      return trimKeysFromResponseMap(split(fullPath), (Map<String, Object>) ns.getValue());
     } else
       return Collections.singletonMap(ns.getKey(), ns.getValue());
   }
 
-  Map<String, Object> trimKeysFromResponseMap(String [] split, Map<String, Object> result) {
-    log.info("using path {}", (Object[])split);
-    for( int i = 0; i < split.length-1; i++ ) {
+  Map<String, Object> trimKeysFromResponseMap(String[] split, Map<String, Object> result) {
+    log.info("using path {}", (Object[]) split);
+    for (int i = 0; i < split.length - 1; i++) {
       log.info("Removing key {}", split[i]);
-      result = (Map<String, Object>)result.remove(split[i]);
+      result = (Map<String, Object>) result.remove(split[i]);
     }
 
-    result.keySet().removeIf(id -> !id.equals(split[split.length-1]));      
+    result.keySet().removeIf(id -> !id.equals(split[split.length - 1]));
     return result;
   }
 
-  public Namespace storeNamespace(Map<String, Object> json, String path, 
-      boolean shouldMerge, boolean shouldReplace)
-      throws JsonMappingException, JsonParseException, IOException {
+  public Namespace storeNamespace(Map<String, Object> json, String path, boolean shouldMerge,
+      boolean shouldReplace) throws JsonMappingException, JsonParseException, IOException {
 
     Namespace materialized = materialize(json, split(path));
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
-    if( extant.isPresent() ) {
+    if (extant.isPresent()) {
       Namespace existing = configRepo.findById(materialized.getNamespace()).get();
-      return mergeReplaceSave(materialized, extant.get(), 
-          existing, split(path), shouldMerge, shouldReplace);
+      return mergeReplaceSave(materialized, extant.get(), existing, split(path), shouldMerge,
+          shouldReplace);
     } else {
       return versionAndSave(materialized, null, hashNamespace(materialized));
     }
   }
 
-  private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS,
-      Namespace existing, String [] path, boolean shouldMergeTrees, boolean shouldReplace) throws JsonProcessingException {
+  private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS, Namespace existing,
+      String[] path, boolean shouldMergeTrees, boolean shouldReplace)
+      throws JsonProcessingException {
     String oldHash = hashNamespace(newNS);
-    if( shouldMergeTrees )
-      merge((Map<String, Object>)newNS.getValue(), 
-          (Map<String, Object>)materialized.getValue());
+    if (shouldMergeTrees)
+      merge((Map<String, Object>) newNS.getValue(), (Map<String, Object>) materialized.getValue());
     else {
-      if( !shouldReplace )
-        if( wouldReplace((Map<String, Object>)newNS.getValue(), 
-          (Map<String, Object>)materialized.getValue(), path) )
+      if (!shouldReplace)
+        if (wouldReplace((Map<String, Object>) newNS.getValue(),
+            (Map<String, Object>) materialized.getValue(), path))
           throw new ConflictException();
-      
-      replace((Map<String, Object>)newNS.getValue(), 
-          (Map<String, Object>)materialized.getValue(), path);
+
+      replace((Map<String, Object>) newNS.getValue(), (Map<String, Object>) materialized.getValue(),
+          path);
     }
-    
+
     return compareAndSaveNamespace(newNS, existing, oldHash);
   }
 
-  private Namespace compareAndSaveNamespace(Namespace newNS, 
-      Namespace existing, String oldHash) throws JsonProcessingException {
+  private Namespace compareAndSaveNamespace(Namespace newNS, Namespace existing, String oldHash)
+      throws JsonProcessingException {
     String newHash = hashNamespace(newNS);
-    if(!oldHash.equals(newHash)) {
+    if (!oldHash.equals(newHash)) {
       return versionAndSave(newNS, existing, newHash);
     } else
       return newNS;
@@ -116,18 +113,18 @@ public class NamespaceService {
   }
 
   private String hashNamespace(Namespace extant) throws JsonProcessingException {
-    return Hashing.sha256().hashString(
-        objectMapper.writeValueAsString(extant.getValue())).toString();
+    return Hashing.sha256().hashString(objectMapper.writeValueAsString(extant.getValue()))
+        .toString();
   }
 
-  String [] split(String fullPath) {
+  String[] split(String fullPath) {
     return fullPath.substring(1).split("/");
   }
 
-  Namespace materialize(Map<String, Object> json, String [] pathTokens) {
+  Namespace materialize(Map<String, Object> json, String[] pathTokens) {
     Map<String, Object> curRoot = json;
 
-    for (int i = pathTokens.length-1; i >= 0; i--) {
+    for (int i = pathTokens.length - 1; i >= 0; i--) {
       log.info("Creating representation for path token {}", pathTokens[i]);
       Map<String, Object> newNodes = new HashMap<>();
       newNodes.put(pathTokens[i], curRoot);
@@ -139,7 +136,7 @@ public class NamespaceService {
 
   Namespace findNamespaceOrThrowException(String fullPath) {
     Namespace ns = nsQueries.findByPath(fullPath);
-    if( ns == null )
+    if (ns == null)
       throw new NotFoundException();
     return ns;
   }
@@ -147,23 +144,22 @@ public class NamespaceService {
   void merge(Map<String, Object> mapExtant, Map<String, Object> mapNew) {
     for (String key : mapNew.keySet()) {
       if (mapExtant.containsKey(key) && mapExtant.get(key) instanceof Map) {
-        merge((Map<String, Object>)mapExtant.get(key), 
-            (Map<String, Object>)mapNew.get(key));
+        merge((Map<String, Object>) mapExtant.get(key), (Map<String, Object>) mapNew.get(key));
       } else
         mapExtant.put(key, mapNew.get(key));
     }
   }
 
-  void replace(Map<String, Object> mapExtant, Map<String, Object> mapNew, String [] path) {
-    if( path.length == 1 ) {//Wipe it from the root
+  void replace(Map<String, Object> mapExtant, Map<String, Object> mapNew, String[] path) {
+    if (path.length == 1) {// Wipe it from the root
       mapExtant.clear();
       mapExtant.putAll(mapNew);
     } else {
       Map<String, Object> curValue = mapExtant;
-      for (int i = 0; i <= path.length-2; i++) {
-        if( curValue != null )
-          if( curValue.get(path[i]) instanceof Map )
-            curValue = (Map<String, Object>)curValue.get(path[i]);
+      for (int i = 0; i <= path.length - 2; i++) {
+        if (curValue != null)
+          if (curValue.get(path[i]) instanceof Map)
+            curValue = (Map<String, Object>) curValue.get(path[i]);
           else
             curValue = null;
         else
@@ -171,27 +167,26 @@ public class NamespaceService {
         log.info("Traversing with key {} with value {}", path[i], curValue);
       }
 
-      if( curValue != null ) //I found where I'm going to do the replacement
-        curValue.remove(path[path.length-1]);
+      if (curValue != null) // I found where I'm going to do the replacement
+        curValue.remove(path[path.length - 1]);
 
       merge(mapExtant, mapNew);
     }
   }
 
-  boolean wouldReplace(Map<String, Object> mapExtant, Map<String, Object> mapNew, String [] path) {
-      Map<String, Object> curValue = mapExtant;
-      for (int i = 0; i <= path.length-2; i++) {
-        if( curValue == null )
-          return false;
-        else
-          if( curValue.get(path[i]) instanceof Map )
-            curValue = (Map<String, Object>)curValue.get(path[i]);
-          else if( curValue.get(path[i]) == null)
-            return false; //path doesn't exist, won't replace anything
-          else
-            return true; //would result in replacing a primitive/array
-      }
+  boolean wouldReplace(Map<String, Object> mapExtant, Map<String, Object> mapNew, String[] path) {
+    Map<String, Object> curValue = mapExtant;
+    for (int i = 0; i <= path.length - 2; i++) {
+      if (curValue == null)
+        return false;
+      else if (curValue.get(path[i]) instanceof Map)
+        curValue = (Map<String, Object>) curValue.get(path[i]);
+      else if (curValue.get(path[i]) == null)
+        return false; // path doesn't exist, won't replace anything
+      else
+        return true; // would result in replacing a primitive/array
+    }
 
-      return curValue.containsKey(path[path.length-1]);
+    return curValue.containsKey(path[path.length - 1]);
   }
 }

@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 @Document
-@JsonSerialize(using=NamespaceSerializer.class)
+@JsonSerialize(using = NamespaceSerializer.class)
 public class Namespace {
 
   private Metadata metadata;
@@ -44,5 +44,5 @@ public class Namespace {
     this.value = value;
     this.namespace = fullNamespace;
   }
-  
+
 }

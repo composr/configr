@@ -29,14 +29,14 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  
+
   @ExceptionHandler
   @ResponseStatus(HttpStatus.CONFLICT)
   public ResponseEntity<String> handleJsonMappingException(ConflictException ex) {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.CONFLICT);
   }
 
-  
+
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<String> handleDefaultException(Throwable ex) {
     String errorResponse = "Unknown error occurred.";
