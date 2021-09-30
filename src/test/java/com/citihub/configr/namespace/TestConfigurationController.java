@@ -19,7 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.NamespaceController;
 import com.citihub.configr.namespace.NamespaceService;
 import com.mongodb.client.MongoClient;

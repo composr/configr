@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.citihub.configr.exception.ConflictException;
 import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
-import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,14 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class NamespaceService {
 
-  private MongoNamespaceQueries nsQueries;
+  private MongoOperations nsQueries;
 
   private MongoConfigRepository configRepo;
 
   private ObjectMapper objectMapper;
 
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
-      @Autowired MongoNamespaceQueries nsQueries, 
+      @Autowired MongoOperations nsQueries, 
       @Autowired ObjectMapper objectMapper) {
     this.configRepo = configRepo;
     this.nsQueries = nsQueries;
@@ -73,42 +73,45 @@ public class NamespaceService {
     Namespace materialized = materialize(json, split(path));
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if( extant.isPresent() ) {
-      return mergeReplaceSave(materialized, extant.get(), split(path), 
-          shouldMerge, shouldReplace);
+      Namespace existing = configRepo.findById(materialized.getNamespace()).get();
+      return mergeReplaceSave(materialized, extant.get(), 
+          existing, split(path), shouldMerge, shouldReplace);
     } else {
-      return versionAndSave(materialized, hashNamespace(materialized));
+      return versionAndSave(materialized, null, hashNamespace(materialized));
     }
   }
 
-  private Namespace mergeReplaceSave(Namespace materialized, Namespace extant,
-      String [] path, boolean shouldMergeTrees, boolean shouldReplace) throws JsonProcessingException {
-    String oldHash = hashNamespace(extant);
+  private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS,
+      Namespace existing, String [] path, boolean shouldMergeTrees, boolean shouldReplace) throws JsonProcessingException {
+    String oldHash = hashNamespace(newNS);
     if( shouldMergeTrees )
-      merge((Map<String, Object>)extant.getValue(), 
+      merge((Map<String, Object>)newNS.getValue(), 
           (Map<String, Object>)materialized.getValue());
     else {
       if( !shouldReplace )
-        if( wouldReplace((Map<String, Object>)extant.getValue(), 
+        if( wouldReplace((Map<String, Object>)newNS.getValue(), 
           (Map<String, Object>)materialized.getValue(), path) )
           throw new ConflictException();
       
-      replace((Map<String, Object>)extant.getValue(), 
+      replace((Map<String, Object>)newNS.getValue(), 
           (Map<String, Object>)materialized.getValue(), path);
     }
     
-    return compareAndSaveNamespace(extant, oldHash);
+    return compareAndSaveNamespace(newNS, existing, oldHash);
   }
 
-  private Namespace compareAndSaveNamespace(Namespace extant, String oldHash) throws JsonProcessingException {
-    String newHash = hashNamespace(extant);
+  private Namespace compareAndSaveNamespace(Namespace newNS, 
+      Namespace existing, String oldHash) throws JsonProcessingException {
+    String newHash = hashNamespace(newNS);
     if(!oldHash.equals(newHash)) {
-      return versionAndSave(extant, newHash);
+      return versionAndSave(newNS, existing, newHash);
     } else
-      return extant;
+      return newNS;
   }
 
-  private Namespace versionAndSave(Namespace ns, String newHash) {
-    ns.setVersion(new Version(newHash));
+  private Namespace versionAndSave(Namespace ns, Namespace oldVersion, String newHash) {
+    nsQueries.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
+    ns.setVersion(new Version(newHash, "Willy Wonka"));
     return configRepo.save(ns);
   }
 

@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
+import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.Namespace;
 import com.mongodb.client.MongoClient;
 
@@ -42,6 +43,9 @@ public class TestSaveConfiguration {
   @MockBean
   private MongoConfigRepository configurationRepository;
 
+  @MockBean
+  private MongoOperations mongoOps;
+  
   @BeforeAll
   public void setupMock() {
     when(configurationRepository.save(any(Namespace.class))).thenAnswer(new Answer<Namespace>() {

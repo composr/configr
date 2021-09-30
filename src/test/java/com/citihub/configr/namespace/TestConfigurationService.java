@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
-import com.citihub.configr.mongostorage.MongoNamespaceQueries;
+import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.NamespaceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class TestConfigurationService {
   private MongoConfigRepository configRepo;
 
   @Mock
-  private MongoNamespaceQueries nsQueries;
+  private MongoOperations nsQueries;
   
   @InjectMocks
   private NamespaceService configService;
