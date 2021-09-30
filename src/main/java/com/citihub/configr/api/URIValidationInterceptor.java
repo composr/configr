@@ -9,11 +9,11 @@ import com.google.common.base.Strings;
 public class URIValidationInterceptor implements HandlerInterceptor {
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
-      Object handler) throws Exception {
-    if (!request.getRequestURI().contains("swagger-ui") &&
-        (Strings.isNullOrEmpty(request.getRequestURI()) || 
-        request.getRequestURI().split("/").length < 3))
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+      throws Exception {
+    if (!request.getRequestURI().contains("swagger-ui")
+        && (Strings.isNullOrEmpty(request.getRequestURI())
+            || request.getRequestURI().split("/").length < 3))
       throw new BadURIException();
 
     return true;

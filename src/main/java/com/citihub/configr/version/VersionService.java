@@ -12,25 +12,25 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class VersionService {
 
-  private MongoOperations nsQueries;
+  private MongoOperations mongoOperations;
 
-  public VersionService(@Autowired MongoOperations nsQueries) {
-    this.nsQueries = nsQueries;
+  public VersionService(@Autowired MongoOperations mongoOperations) {
+    this.mongoOperations = mongoOperations;
   }
 
-  public @NonNull Namespace fetchNamespace(String fullPath) {
+  public @NonNull Namespace fetchVersions(String fullPath) {
     Namespace ns = findNamespaceOrThrowException(fullPath);
     log.info("using path {}, I found: {}", split(fullPath), ns);
     return ns;
   }
 
-  String [] split(String fullPath) {
+  String[] split(String fullPath) {
     return fullPath.substring(1).split("/");
   }
 
   Namespace findNamespaceOrThrowException(String fullPath) {
-    Namespace ns = nsQueries.findByPath(fullPath);
-    if( ns == null )
+    Namespace ns = mongoOperations.findByPath(fullPath);
+    if (ns == null)
       throw new NotFoundException();
     return ns;
   }
