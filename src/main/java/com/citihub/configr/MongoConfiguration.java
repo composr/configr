@@ -3,6 +3,7 @@ package com.citihub.configr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import com.google.common.base.Strings;
 import com.mongodb.ConnectionString;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
+@Profile("!test")
 public class MongoConfiguration {
 
   @Value("${mongodb.db}")
