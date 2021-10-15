@@ -2,23 +2,15 @@ package com.citihub.configr.mongostorage;
 
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import com.citihub.configr.MongoConfiguration;
+import com.citihub.configr.base.MongoTest;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Tag("integration")
-@Tag("data")
-@DataMongoTest
-@TestInstance(Lifecycle.PER_CLASS)
-public class TestMongoOperations {
+public class TestMongoOperations extends MongoTest {
 
   private static final String POST_SAVE_CONTENT =
       "{\"x\":{\"y\":{\"z\":{ \"foo\": { \"bar\": { \"baz\": [ { \"buzz\": \"bizz\" }, { \"foo2\": \"bar2\" } ] } } }}}}";

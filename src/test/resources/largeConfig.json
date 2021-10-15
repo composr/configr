@@ -1,0 +1,38 @@
+{
+    "z": {
+        "y": {
+            "a": {
+                "f": {
+                    "boo": {
+                        "fooz": [
+                            "ballz",
+                            "bazz"
+                        ],
+                        "foo": [
+                            "ballz",
+                            "bazz"
+                        ]
+                    },
+                    "ba": {
+                        "nee": "nah"
+                    }
+                }
+            }
+        }
+    },
+    "y": {
+        "a": {
+            "f": {
+                "boo": {
+                    "fooz": [
+                        "ball",
+                        "bazz"
+                    ]
+                },
+                "ba": {
+                    "nee": "nah"
+                }
+            }
+        }
+    }
+}

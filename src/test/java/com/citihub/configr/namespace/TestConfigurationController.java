@@ -2,20 +2,13 @@ package com.citihub.configr.namespace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import javax.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import com.citihub.configr.base.UnitTest;
 
-@Tag("unit")
-@TestInstance(Lifecycle.PER_CLASS)
-@ExtendWith(MockitoExtension.class)
-public class TestConfigurationController {
+public class TestConfigurationController extends UnitTest {
 
   @MockBean
   private NamespaceService configurationService;

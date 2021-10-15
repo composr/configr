@@ -6,6 +6,7 @@ The Configuration store is an API-driven, hierarchical configuration storage pla
 
 ![build-test](https://github.com/citihub/configr/workflows/build-test/badge.svg)
 [![Apache 2.0](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/citihub/configr/blob/master/LICENSE)
+[![codecov](https://codecov.io/gh/citihub/configr/branch/develop/graph/badge.svg)](https://codecov.io/gh/citihub/configr)
 
 <u>Planned Features</u>
 <ul>

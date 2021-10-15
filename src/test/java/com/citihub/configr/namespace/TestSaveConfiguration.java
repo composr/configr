@@ -8,26 +8,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.citihub.configr.MongoConfiguration;
+import com.citihub.configr.base.IntegrationTest;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
 import com.mongodb.client.MongoClient;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestInstance(Lifecycle.PER_CLASS)
-public class TestSaveConfiguration {
-
+public class TestSaveConfiguration extends IntegrationTest {
 
   private static final String POST_SAVE_CONTENT =
       "{\"x\":{\"y\":{\"z\":{ \"foo\": { \"bar\": { \"baz\": [ { \"buzz\": \"bizz\" }, { \"foo2\": \"bar2\" } ] } } }}}}";
@@ -46,7 +38,7 @@ public class TestSaveConfiguration {
 
   @MockBean
   private MongoOperations mongoOps;
-  
+
   @BeforeAll
   public void setupMock() {
     when(configurationRepository.save(any(Namespace.class))).thenAnswer(new Answer<Namespace>() {
