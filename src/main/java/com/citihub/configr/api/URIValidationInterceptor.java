@@ -4,18 +4,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 import com.citihub.configr.exception.BadURIException;
-import com.google.common.base.Strings;
 
 public class URIValidationInterceptor implements HandlerInterceptor {
+
+  private final String VALID_URI_REGEX = "/{1}(configuration||metadata||version)/.+";
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
-    if (!request.getRequestURI().contains("swagger-ui")
-        && (Strings.isNullOrEmpty(request.getRequestURI())
-            || request.getRequestURI().split("/").length < 3))
+    if (!isValidURI(request.getRequestURI()))
       throw new BadURIException();
 
     return true;
+  }
+
+  boolean isValidURI(String uri) {
+    return uri.matches(VALID_URI_REGEX) || uri.contains("swagger-ui.html");
   }
 }

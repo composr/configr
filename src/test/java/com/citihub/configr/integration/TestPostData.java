@@ -59,6 +59,12 @@ public class TestPostData extends IntegrationTest {
   }
 
   @Test
+  public void testGetBadRequest() throws Exception {
+    mockMvc.perform(get("/configuration").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testPut() throws Exception {
     MvcResult result = mockMvc
         .perform(put("/configuration/x").content(readResource("smallConfig.json"))

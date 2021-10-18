@@ -37,11 +37,8 @@ public class MongoOperations {
   @PostConstruct
   public void postConstruct() {
     log.info("Ensuring indexes are set.");
-    try {
-      ensureIndexes(mongoTemplate);
-    } catch (NullPointerException e) {
-      log.error("DB is null - expected during test runs but this is a " + "horrible hack.");
-    }
+
+    ensureIndexes(mongoTemplate);
   }
 
   private void ensureIndexes(MongoTemplate mongoTemplate) {
@@ -70,6 +67,14 @@ public class MongoOperations {
       e.printStackTrace();
       throw new SaveFailureException();
     }
+  }
+
+  public Namespace listVersionsByPath(String path) {
+    String whereClause = "value" + path.replaceAll("\\/", "\\.");
+
+    Query query = new Query();
+    query.addCriteria(Criteria.where(whereClause).exists(true));
+    return mongoTemplate.findOne(query, Namespace.class);
   }
 
   public Namespace findByPath(String path) {
