@@ -8,10 +8,12 @@ import com.citihub.configr.namespace.Namespace;
 import com.google.common.hash.Hashing;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Slf4j
 @Document
 public class VersionedNamespace {
