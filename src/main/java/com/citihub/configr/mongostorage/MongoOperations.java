@@ -1,8 +1,11 @@
 package com.citihub.configr.mongostorage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
@@ -10,6 +13,7 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.exception.SaveFailureException;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.version.VersionedNamespace;
@@ -17,6 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.diff.JsonDiff;
 import com.google.common.hash.Hashing;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,11 +43,8 @@ public class MongoOperations {
   @PostConstruct
   public void postConstruct() {
     log.info("Ensuring indexes are set.");
-    try {
-      ensureIndexes(mongoTemplate);
-    } catch (NullPointerException e) {
-      log.error("DB is null - expected during test runs but this is a " + "horrible hack.");
-    }
+
+    ensureIndexes(mongoTemplate);
   }
 
   private void ensureIndexes(MongoTemplate mongoTemplate) {
@@ -70,6 +73,22 @@ public class MongoOperations {
       e.printStackTrace();
       throw new SaveFailureException();
     }
+  }
+
+  public List<Document> listVersionsByPath(String path) {
+    log.info("Looking for collection named collection_{}", path);
+    String collectionName =
+        VERSION_COLLECTION_PREFIX + Hashing.sha256().hashString(path).toString();
+    log.info("And in hash-form", collectionName);
+    if (mongoTemplate.collectionExists(collectionName)) {
+      MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
+
+      List<Document> results = new ArrayList<Document>();
+      collection.find().sort(new BasicDBObject("created", 1)).limit(10).iterator()
+          .forEachRemaining(vns -> results.add(vns));
+      return results;
+    } else
+      throw new NotFoundException();
   }
 
   public Namespace findByPath(String path) {

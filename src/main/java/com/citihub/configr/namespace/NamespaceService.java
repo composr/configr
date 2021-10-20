@@ -106,7 +106,7 @@ public class NamespaceService {
       return newNS;
   }
 
-  private Namespace versionAndSave(Namespace ns, Namespace oldVersion, String newHash) {
+  Namespace versionAndSave(Namespace ns, Namespace oldVersion, String newHash) {
     nsQueries.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
     ns.setVersion(new Version(newHash, "Willy Wonka"));
     return configRepo.save(ns);
