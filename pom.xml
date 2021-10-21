@@ -12,6 +12,7 @@
 		<spring.framework.version>5.3.9</spring.framework.version>
 		<spring-boot.version>2.5.4</spring-boot.version>
 		<jacoco.version>0.8.7</jacoco.version>
+		<azure.ad.starter.version>3.7.0</azure.ad.starter.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
@@ -37,6 +38,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
+			<version>${azure.ad.starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>

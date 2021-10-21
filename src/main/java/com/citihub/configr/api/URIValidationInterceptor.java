@@ -7,7 +7,11 @@ import com.citihub.configr.exception.BadURIException;
 
 public class URIValidationInterceptor implements HandlerInterceptor {
 
-  private final String VALID_URI_REGEX = "/{1}(configuration||metadata||version)/.+";
+  /**
+   * Allows the base routes plus swagger/openapi endpoints
+   */
+  private final String VALID_URI_REGEX =
+      "/{1}(configuration/.+|metadata/.+|version/.+|v3/.*|swagger-ui/.*|swagger-ui.html)";
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -19,6 +23,6 @@ public class URIValidationInterceptor implements HandlerInterceptor {
   }
 
   boolean isValidURI(String uri) {
-    return uri.matches(VALID_URI_REGEX) || uri.contains("swagger-ui.html");
+    return uri.matches(VALID_URI_REGEX);
   }
 }

@@ -20,7 +20,7 @@ import com.citihub.configr.base.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TestVersioning extends IntegrationTest {
+public class TestCRUDE2E extends IntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;

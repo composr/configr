@@ -48,4 +48,14 @@ public class URIValidationTest extends UnitTest {
   public void testSwagger() throws Exception {
     assertThat(interceptor.isValidURI("/swagger-ui.html")).isTrue();
   }
+
+  @Test
+  public void testSwaggerUIRoutes() throws Exception {
+    assertThat(interceptor.isValidURI("/swagger-ui/index.html")).isTrue();
+  }
+
+  @Test
+  public void testAPIDocsRoute() throws Exception {
+    assertThat(interceptor.isValidURI("/v3/api-docs/swagger-config")).isTrue();
+  }
 }
