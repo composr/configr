@@ -1,3 +1,5 @@
+authentication:
+  enabled: true
 springdoc:
   packagesToScan: com.citihub.configr.namespace, com.citihub.configr.version
   pathsToMatch: /**
@@ -7,3 +9,7 @@ mongodb:
   auth_db: admin
   username:
   password:
+azure:
+  activedirectory:
+    client-id: 11111111-1111-1111-1111-1111111111111111
+    app-id-uri: <your-app-ID-URI>

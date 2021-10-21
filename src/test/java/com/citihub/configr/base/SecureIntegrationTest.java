@@ -10,10 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * Base class bootstrapping Spring and an embedded Mongo
  */
-@SpringBootTest({"authentication.enabled=false"})
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest
+@AutoConfigureMockMvc(addFilters = true)
 @TestInstance(Lifecycle.PER_CLASS)
 @Tag("integration")
 @ActiveProfiles("test")
-public class IntegrationTest {
+public class SecureIntegrationTest {
 }

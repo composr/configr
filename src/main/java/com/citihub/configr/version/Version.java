@@ -18,9 +18,4 @@ public class Version {
     created = LocalDateTime.now();
   }
 
-  public Version(Version version) {
-    this.id = version.getId();
-    this.created = version.getCreated();
-    this.creator = version.creator;
-  }
 }
