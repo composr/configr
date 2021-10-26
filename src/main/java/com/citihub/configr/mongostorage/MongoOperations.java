@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.PostConstruct;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition;
-import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -38,20 +35,6 @@ public class MongoOperations {
       @Autowired ObjectMapper objectMapper) {
     this.mongoTemplate = mongoTemplate;
     this.objectMapper = objectMapper;
-  }
-
-  @PostConstruct
-  public void postConstruct() {
-    log.info("Ensuring indexes are set.");
-
-    ensureIndexes(mongoTemplate);
-  }
-
-  private void ensureIndexes(MongoTemplate mongoTemplate) {
-    TextIndexDefinition textIndex =
-        new TextIndexDefinitionBuilder().onField("namespace", 1f).build();
-
-    mongoTemplate.indexOps(Namespace.class).ensureIndex(textIndex);
   }
 
   public void saveAsOldVersion(Optional<Namespace> oldVersion, Namespace newVersion) {
