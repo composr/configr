@@ -1,5 +1,7 @@
 authentication:
   enabled: true
+cors:
+  allowedOrigins: "*"
 springdoc:
   packagesToScan: com.citihub.configr.namespace, com.citihub.configr.version
   pathsToMatch: /**
