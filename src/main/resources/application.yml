@@ -1,5 +1,5 @@
 authentication:
-  enabled: true
+  enabled: false
 cors:
   allowedOrigins: "*"
 springdoc:
