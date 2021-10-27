@@ -61,6 +61,9 @@ public class MongoConfiguration {
   }
 
   private void setX509Auth(MongoClientFactoryBean mongo) {
+    System.setProperty("javax.net.ssl.keyStore", keyStorePath);
+    System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+
     mongo.setMongoClientSettings(
         MongoClientSettings.builder().credential(MongoCredential.createMongoX509Credential())
             .applyToSslSettings(b -> b.enabled(true)).build());
