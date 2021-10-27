@@ -11,6 +11,8 @@ mongodb:
   auth_db: admin
   username:
   password:
+  mongo_keystore_path:
+  mongo_keystore_password:
 azure:
   activedirectory:
     client-id: 11111111-1111-1111-1111-1111111111111111
