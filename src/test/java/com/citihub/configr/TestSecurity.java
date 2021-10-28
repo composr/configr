@@ -1,4 +1,4 @@
-package com.citihub.configr.integration;
+package com.citihub.configr;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.base.SecureIntegrationTest;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class TestSecurity extends SecureIntegrationTest {
 
   @Autowired
