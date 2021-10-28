@@ -1,5 +1,8 @@
 authentication:
   enabled: false
+  proxy:
+    host:
+    port:
 cors:
   allowedOrigins: "*"
 springdoc:

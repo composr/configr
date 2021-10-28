@@ -11,6 +11,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.azure.spring.aad.webapi.AADResourceServerWebSecurityConfigurerAdapter;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +26,12 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
   @Value("${authentication.enabled}")
   private boolean authEnabled;
 
+  @Value("${authentication.proxy.host}")
+  private String authProxyHost;
+
+  @Value("${authentication.proxy.port}")
+  private String authProxyPort;
+
   @Value("${cors.allowedOrigins}")
   private String[] allowedOrigins;
 
@@ -36,9 +43,21 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
       log.info("Using Azure AD authentication.");
       super.configure(http);
       enableRequestAuth(http);
+      checkAuthProxies();
     } else {
       log.info("Bypassing all authentication.");
       disableRequestAuth(http);
+    }
+  }
+
+  private void checkAuthProxies() {
+    if (!Strings.isNullOrEmpty(authProxyHost)) {
+      log.info("Using auth proxy, {}:{}, for calls to microsoftonline", authProxyHost,
+          authProxyPort);
+
+      System.setProperty("http.proxyHost", authProxyHost);
+      System.setProperty("http.proxyPort", authProxyPort);
+      System.setProperty("http.nonProxyHost", "!*microsoftonline*");
     }
   }
 
