@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
@@ -15,8 +16,9 @@ import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 public class TestMongoConfiguration {
 
   @Bean
-  public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory) {
-    return new MongoTemplate(mongoDatabaseFactory);
+  public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory,
+      MongoConverter mongoConverter) {
+    return new MongoTemplate(mongoDatabaseFactory, mongoConverter);
   }
 
   @Bean
