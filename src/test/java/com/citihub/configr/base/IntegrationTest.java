@@ -6,13 +6,15 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import com.citihub.configr.TestMongoConfiguration;
 
 /**
  * Base class bootstrapping Spring and an embedded Mongo
  */
-@SpringBootTest({"authentication.enabled=false"})
+@SpringBootTest({"authentication.enabled=false", "authorization.enabled=false"})
+@WithMockUser(username = "bobbo")
 @Import(TestMongoConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 @TestInstance(Lifecycle.PER_CLASS)

@@ -67,13 +67,9 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
 
   private void enableRequestAuth(HttpSecurity http) throws Exception {
     http.authorizeRequests((requests) -> {
-      try {
-        requests.antMatchers("/swagger-ui.html").permitAll().antMatchers("/swagger-ui/**")
-            .permitAll().antMatchers("/v3/**").permitAll().antMatchers("/liveness").permitAll()
-            .anyRequest().authenticated();
-      } catch (Exception e) {
-        log.error("Error setting up HttpSecurity. Bailing.");
-      }
+      requests.antMatchers("/swagger-ui.html").permitAll().antMatchers("/swagger-ui/**").permitAll()
+          .antMatchers("/v3/**").permitAll().antMatchers("/liveness").permitAll().anyRequest()
+          .authenticated();
     });
   }
 

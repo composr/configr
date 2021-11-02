@@ -4,6 +4,7 @@ authentication:
     host:
     port:
 authorization:
+  enabled: false
   roles:
     read:
     write:
