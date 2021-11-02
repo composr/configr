@@ -49,7 +49,7 @@ public class TestCRUDE2E extends IntegrationTest {
             .andExpect(status().is2xxSuccessful()).andReturn();
 
     assertThat(result.getResponse().getContentAsString()).isEqualTo(
-        "{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}");
+        "{\"z\":{\"$y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}");
   }
 
   @Test
@@ -83,7 +83,7 @@ public class TestCRUDE2E extends IntegrationTest {
         .andExpect(status().is2xxSuccessful()).andReturn();
 
     assertThat(result.getResponse().getContentAsString()).isEqualTo(
-        "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
+        "{\"x\":{\"z\":{\"$y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
   }
 
   @Test
@@ -100,7 +100,7 @@ public class TestCRUDE2E extends IntegrationTest {
         .andExpect(status().is2xxSuccessful()).andReturn();
 
     assertThat(result.getResponse().getContentAsString()).isEqualTo(
-        "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}},\"a\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
+        "{\"x\":{\"z\":{\"$y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}},\"a\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
 
   }
 
@@ -112,7 +112,7 @@ public class TestCRUDE2E extends IntegrationTest {
         .andExpect(status().is2xxSuccessful()).andReturn();
 
     assertThat(result.getResponse().getContentAsString()).isEqualTo(
-        "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}},\"a\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
+        "{\"x\":{\"z\":{\"$y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}},\"a\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}}");
   }
 
   @Test
@@ -123,7 +123,7 @@ public class TestCRUDE2E extends IntegrationTest {
         .andExpect(status().is2xxSuccessful()).andReturn();
 
     assertThat(result.getResponse().getContentAsString()).isEqualTo(
-        "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}},\"ba\":{\"nee\":\"nah\"}},\"a\":{\"f\":{\"boo\":{\"foo\":[\"barn\",\"nrab\"]},\"ba\":{\"nee\":\"nah\"}}}}}");
+        "{\"x\":{\"z\":{\"$y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ballz\",\"bazz\"],\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}},\"ba\":{\"nee\":\"nah\"}},\"a\":{\"f\":{\"boo\":{\"foo\":[\"barn\",\"nrab\"]},\"ba\":{\"nee\":\"nah\"}}}}}");
   }
 
 }

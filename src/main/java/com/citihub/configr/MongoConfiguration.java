@@ -9,12 +9,7 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.DbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.util.StringUtils;
 import com.google.common.base.Strings;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -52,10 +47,7 @@ public class MongoConfiguration {
   private MongoClient mongoClient;
 
   @Autowired
-  private MongoDatabaseFactory mongoDatabaseFactory;
-
-  @Autowired
-  private MongoMappingContext mongoMappingContext;
+  private MappingMongoConverter mongoConverter;
 
   public @Bean MongoClientFactoryBean mongo() {
     MongoClientFactoryBean mongo = new MongoClientFactoryBean();
@@ -68,39 +60,12 @@ public class MongoConfiguration {
     return mongo;
   }
 
-  public @Bean MongoConverter mongoConverter() {
-    DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDatabaseFactory);
-    MappingMongoConverter mappingMongoConverter =
-        new MappingMongoConverter(dbRefResolver, mongoMappingContext) {
-          @Override
-          protected String potentiallyEscapeMapKey(String source) {
-            source = super.potentiallyEscapeMapKey(source);
-
-            if (!source.contains("$"))
-              return source;
-            else
-              return StringUtils.replace(source, "$", "#{dollarSign}");
-          }
-
-          @Override
-          protected String potentiallyUnescapeMapKey(String source) {
-            source = super.potentiallyUnescapeMapKey(source);
-            return StringUtils.replace(source, "#{dollarSign}", "$");
-          }
-        };
-
-    mappingMongoConverter.setMapKeyDotReplacement("#{dot}");
-    mappingMongoConverter.afterPropertiesSet();
-    return mappingMongoConverter;
-  }
-
   public @Bean MongoDatabaseFactory mongoDatabaseFactory() {
     return new SimpleMongoClientDatabaseFactory(mongoClient, db);
   }
 
   public @Bean MongoTemplate mongoTemplate() {
-    MongoTemplate template = new MongoTemplate(mongoDatabaseFactory(), mongoConverter());
-    return template;
+    return new MongoTemplate(mongoDatabaseFactory(), mongoConverter);
   }
 
   private void setBasicCredentialAuth(MongoClientFactoryBean mongo) {
