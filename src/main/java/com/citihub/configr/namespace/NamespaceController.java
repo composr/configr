@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,12 +28,14 @@ public class NamespaceController {
     this.configurationService = configurationService;
   }
 
+  @PreAuthorize("@authorizer.canRead()")
   @GetMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Map<String, Object> getData(HttpServletRequest request,
       HttpServletResponse response) {
     return configurationService.fetchNamespaceBodyByPath(getTrimmedPath(request));
   }
 
+  @PreAuthorize("@authorizer.canWrite()")
   @PostMapping(consumes = {"application/json", "application/yaml", "application/yml"},
       value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Namespace postData(@RequestBody Map<String, Object> json,
@@ -42,6 +45,7 @@ public class NamespaceController {
     return configurationService.storeNamespace(json, getTrimmedPath(request), false, false);
   }
 
+  @PreAuthorize("@authorizer.canWrite()")
   @PutMapping(consumes = {"application/json", "application/yaml", "application/yml"}, value = "/**",
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Namespace putData(@RequestBody Map<String, Object> json,
@@ -51,6 +55,7 @@ public class NamespaceController {
     return configurationService.storeNamespace(json, getTrimmedPath(request), false, true);
   }
 
+  @PreAuthorize("@authorizer.canWrite()")
   @PatchMapping(consumes = {"application/json", "application/yaml", "application/yml"},
       value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Namespace patchWithData(@RequestBody Map<String, Object> json,

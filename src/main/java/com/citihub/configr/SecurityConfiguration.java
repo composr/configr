@@ -55,9 +55,9 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
       log.info("Using auth proxy, {}:{}, for calls to microsoftonline", authProxyHost,
           authProxyPort);
 
-      System.setProperty("http.proxyHost", authProxyHost);
-      System.setProperty("http.proxyPort", authProxyPort);
-      System.setProperty("http.nonProxyHost", "!*microsoftonline*");
+      System.setProperty("https.proxyHost", authProxyHost);
+      System.setProperty("https.proxyPort", authProxyPort);
+      System.setProperty("https.nonProxyHost", "!*microsoftonline*");
     }
   }
 
@@ -67,13 +67,9 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
 
   private void enableRequestAuth(HttpSecurity http) throws Exception {
     http.authorizeRequests((requests) -> {
-      try {
-        requests.antMatchers("/swagger-ui.html").permitAll().antMatchers("/swagger-ui/**")
-            .permitAll().antMatchers("/v3/**").permitAll().antMatchers("/liveness").permitAll()
-            .anyRequest().authenticated();
-      } catch (Exception e) {
-        log.error("Error setting up HttpSecurity. Bailing.");
-      }
+      requests.antMatchers("/swagger-ui.html").permitAll().antMatchers("/swagger-ui/**").permitAll()
+          .antMatchers("/v3/**").permitAll().antMatchers("/liveness").permitAll().anyRequest()
+          .authenticated();
     });
   }
 

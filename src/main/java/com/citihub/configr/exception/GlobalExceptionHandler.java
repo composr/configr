@@ -2,6 +2,7 @@ package com.citihub.configr.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,13 +30,17 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-
   @ExceptionHandler
   @ResponseStatus(HttpStatus.CONFLICT)
   public ResponseEntity<String> handleJsonMappingException(ConflictException ex) {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.CONFLICT);
   }
 
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ResponseEntity<String> handleAccessDenied(AccessDeniedException ex) {
+    return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
+  }
 
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<String> handleDefaultException(Throwable ex) {

@@ -3,6 +3,12 @@ authentication:
   proxy:
     host:
     port:
+authorization:
+  enabled: false
+  roles:
+    read:
+    write:
+    delete:
 cors:
   allowedOrigins: "*"
 springdoc:
