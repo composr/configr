@@ -55,9 +55,9 @@ public class SecurityConfiguration extends AADResourceServerWebSecurityConfigure
       log.info("Using auth proxy, {}:{}, for calls to microsoftonline", authProxyHost,
           authProxyPort);
 
-      System.setProperty("http.proxyHost", authProxyHost);
-      System.setProperty("http.proxyPort", authProxyPort);
-      System.setProperty("http.nonProxyHost", "!*microsoftonline*");
+      System.setProperty("https.proxyHost", authProxyHost);
+      System.setProperty("https.proxyPort", authProxyPort);
+      System.setProperty("https.nonProxyHost", "!*microsoftonline*");
     }
   }
 
