@@ -58,7 +58,7 @@ public class TestVersioningE2E extends IntegrationTest {
     List<Map<String, Object>> nss =
         new ObjectMapper().readValue(content, new TypeReference<List<Map<String, Object>>>() {});
 
-    assertThat(nss.size()).isEqualTo(2);
+    assertThat(nss.size()).isGreaterThanOrEqualTo(2);
   }
 
 }
