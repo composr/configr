@@ -12,7 +12,7 @@ authorization:
 cors:
   allowedOrigins: "*"
 springdoc:
-  packagesToScan: com.citihub.configr.namespace, com.citihub.configr.version
+  packagesToScan: com.citihub.configr.namespace, com.citihub.configr.version, com.citihub.configr.query
   pathsToMatch: /**
 mongodb:
   uri: mongodb://localhost:27017/?ssl=false

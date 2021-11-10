@@ -6,6 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import com.jayway.jsonpath.JsonPathException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,6 +17,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<String> handleJsonMappingException(BadURIException ex) {
     return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<String> handleBadJsonPathQuery(JsonPathException ex) {
+    return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler

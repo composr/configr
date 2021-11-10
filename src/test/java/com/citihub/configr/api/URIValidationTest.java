@@ -15,6 +15,11 @@ public class URIValidationTest extends UnitTest {
   }
 
   @Test
+  public void testQuery() throws Exception {
+    assertThat(interceptor.isValidURI("/query?jsonPath=$..*")).isTrue();
+  }
+
+  @Test
   public void testFound() throws Exception {
     assertThat(interceptor.isValidURI("/foo/bar/baz")).isFalse();
   }
