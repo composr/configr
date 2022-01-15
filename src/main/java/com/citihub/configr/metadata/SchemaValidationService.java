@@ -1,12 +1,53 @@
 package com.citihub.configr.metadata;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.citihub.configr.exception.SchemaValidationException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchema;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 @Service
 public class SchemaValidationService {
-
-  public Object validate(String json, String schema) {
-    return null;
-  }
+	
+	private ObjectMapper objectMapper;
+	
+	public SchemaValidationService(@Autowired ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+	
+	public SchemaValidationResult validateJSON(final String json, final String schema)
+		throws SchemaValidationException
+	{
+	  
+	  if (json == null || schema == null)
+		  throw new SchemaValidationException("Inputs cannot be null");
+	  
+	  try {
+		final JsonNode jsonObj = this.objectMapper.readTree(json);
+		final JsonNode schemaObj = this.objectMapper.readTree(schema);
+		
+		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+		
+		final JsonSchema jsonSchema = factory.getJsonSchema(schemaObj);
+		
+		ProcessingReport report = jsonSchema.validate(jsonObj);
+		
+		SchemaValidationResult result = new SchemaValidationResult(report.isSuccess(), report.toString());
+		
+		return result;
+		
+	  } catch (IOException | ProcessingException e) {
+		e.printStackTrace();
+		throw new SchemaValidationException("An error occurred while processing schema validation. Check logs.");
+	  }
+	  
+	}
 
 }
