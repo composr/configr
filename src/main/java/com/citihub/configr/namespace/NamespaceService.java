@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class NamespaceService {
 
-  private MongoOperations nsQueries;
+  private MongoOperations mongoOperations;
 
   private MongoConfigRepository configRepo;
 
@@ -33,7 +33,7 @@ public class NamespaceService {
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
       @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper) {
     this.configRepo = configRepo;
-    this.nsQueries = nsQueries;
+    this.mongoOperations = nsQueries;
     this.objectMapper = objectMapper;
   }
 
@@ -107,7 +107,7 @@ public class NamespaceService {
   }
 
   Namespace versionAndSave(Namespace ns, Namespace oldVersion, String newHash) {
-    nsQueries.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
+    mongoOperations.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
     ns.setVersion(new Version(newHash, "Willy Wonka"));
     return configRepo.save(ns);
   }
@@ -135,7 +135,7 @@ public class NamespaceService {
   }
 
   Namespace findNamespaceOrThrowException(String fullPath) {
-    Namespace ns = nsQueries.findByPath(fullPath);
+    Namespace ns = mongoOperations.findByPath(fullPath);
     if (ns == null)
       throw new NotFoundException();
     return ns;
