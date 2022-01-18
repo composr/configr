@@ -2,6 +2,9 @@ package com.citihub.configr.metadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import com.citihub.configr.base.UnitTest;
@@ -12,119 +15,92 @@ public class SchemaValidationServiceTest extends UnitTest {
 
   private SchemaValidationService validationService;
 
-  private final String jsonSchema = """
-      {
-      	"$schema": "http://json-schema.org/draft-04/schema#",
-      	"title": "Product",
-      	"description": "A product from the catalog",
-      	"type": "object",
-      	"properties": {
-      		"id": {
-      			"description": "The unique identifier for a product",
-                  "type": "integer"
-              },
-              "name": {
-                  "description": "Name of the product",
-                  "type": "string"
-              },
-              "price": {
-                  "type": "number",
-                  "minimum": 0,
-                  "exclusiveMinimum": true
-              }
-      	},
-      	"required": ["id", "name", "price"]
-      }
-      """;
+  private String jsonSchema;
 
-  private final String jsonValid = """
-      {
-      	"id": 1,
-      	"name": "book",
-      	"price": 2
-      }
-      """;
+  private String jsonValid;
+
+  private Path workingDir;
+
+  private String readResource(String resourceName) throws IOException {
+    return Files.readString(this.workingDir.resolve(resourceName));
+  }
 
   @BeforeAll
-  public void setup() {
+  public void setup() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     validationService = new SchemaValidationService(mapper);
+    this.workingDir = Path.of("", "src/test/resources");
+    this.jsonSchema = readResource("jsonSchema.json");
+    this.jsonValid = readResource("jsonValidSchema.json");
   }
 
   @Test
-  public void testValidateJSONWithInvalidMinimumShallFail() {
+  public void testValidateJSONWithInvalidMinimumShallFail() throws Exception {
 
-    String jsonInvalidMinimumPriceValue = """
-        {
-        	"id": 1,
-        	"name": "book",
-        	"price": 0
-        }
-        """;
-    var result = validationService.validateJSON(jsonInvalidMinimumPriceValue, jsonSchema);
-    assertThat(result.getIsSuccess()).isFalse();
+    SchemaValidationResult result = validationService
+        .validateJSON(readResource("jsonInvalidMinimumPriceValue.json"), jsonSchema);
 
-  }
-
-  @Test
-  public void testValidateJSONWithInvalidTypeShallFail() {
-
-    String jsonInvalidIDType = """
-        {
-            "id": "not a number",
-            "name": "book",
-            "price": 0
-        }
-        """;
-    var result = validationService.validateJSON(jsonInvalidIDType, jsonSchema);
-    assertThat(result.getIsSuccess()).isFalse();
+    assertThat(result.isSuccess()).isFalse();
 
   }
 
   @Test
-  public void testValidateJSONWithMissingRequiredFieldShallFail() {
+  public void testValidateJSONWithInvalidTypeShallFail() throws Exception {
 
-    String jsonInvalidMissingField = """
-        {
-            "id": 1,
-            "price": 2
-        }
-        """;
-    var result = validationService.validateJSON(jsonInvalidMissingField, jsonSchema);
-    assertThat(result.getIsSuccess()).isFalse();
+    SchemaValidationResult result =
+        validationService.validateJSON(readResource("jsonInvalidIDType.json"), jsonSchema);
+
+    assertThat(result.isSuccess()).isFalse();
+
+  }
+
+  @Test
+  public void testValidateJSONWithMissingRequiredFieldShallFail() throws Exception {
+
+    SchemaValidationResult result = validationService
+        .validateJSON(readResource("jsonInvalidMissingRequiredField.json"), jsonSchema);
+
+    assertThat(result.isSuccess()).isFalse();
 
   }
 
   @Test
   public void testValidateJSONWithValidShallSucceed() {
 
-    var result = validationService.validateJSON(jsonValid, jsonSchema);
-    assertThat(result.getIsSuccess()).isTrue();
+    SchemaValidationResult result = validationService.validateJSON(jsonValid, jsonSchema);
+
+    assertThat(result.isSuccess()).isTrue();
 
   }
 
   @Test
-  public void testValidateJSONWithNullShallRaiseException() {
+  public void testValidateJSONWithNullsShallRaiseException() {
 
     assertThrows(SchemaValidationException.class, () -> validationService.validateJSON(null, null));
-    assertThrows(SchemaValidationException.class,
-        () -> validationService.validateJSON(null, jsonSchema));
-    assertThrows(SchemaValidationException.class,
-        () -> validationService.validateJSON(jsonValid, null));
+
   }
 
   @Test
-  public void testValidateJSONWithMalformedShallRaiseException() {
+  public void testValidateJSONWithNullJSONShallRaiseException() {
 
-    String jsonInvalidSyntax = """
-        {
-            "id": 1,
-            "name": "book
-            "price": 2
-        }
-        """;
     assertThrows(SchemaValidationException.class,
-        () -> validationService.validateJSON(jsonInvalidSyntax, jsonSchema));
+        () -> validationService.validateJSON(null, jsonSchema));
+
+  }
+
+  @Test
+  public void testValidateJSONWithNullSchemaShallRaiseException() {
+
+    assertThrows(SchemaValidationException.class,
+        () -> validationService.validateJSON(jsonValid, null));
+
+  }
+
+  @Test
+  public void testValidateJSONWithMalformedShallRaiseException() throws Exception {
+
+    assertThrows(SchemaValidationException.class,
+        () -> validationService.validateJSON(readResource("jsonInvalidSyntax.json"), jsonSchema));
 
   }
 
