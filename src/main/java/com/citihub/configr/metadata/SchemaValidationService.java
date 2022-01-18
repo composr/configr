@@ -33,9 +33,7 @@ public class SchemaValidationService {
 		final JsonNode jsonObj = this.objectMapper.readTree(json);
 		final JsonNode schemaObj = this.objectMapper.readTree(schema);
 		
-		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-		
-		final JsonSchema jsonSchema = factory.getJsonSchema(schemaObj);
+		final JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(schemaObj);
 		
 		ProcessingReport report = jsonSchema.validate(jsonObj);
 		
