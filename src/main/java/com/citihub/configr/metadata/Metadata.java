@@ -1,5 +1,6 @@
 package com.citihub.configr.metadata;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Metadata {
 
+  public enum ValidationLevel {
+    NONE, STRICT, LOOSE
+  }
+
   private String description;
-  private String owner;
-  private String somethingElse;
+  private List<ACL> acls;
+  private String schema;
+  private ValidationLevel validationLevel;
 
   private String[] tags;
 
