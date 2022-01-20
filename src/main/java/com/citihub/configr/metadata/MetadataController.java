@@ -40,7 +40,7 @@ public class MetadataController {
   public @ResponseBody Metadata putData(@RequestBody Metadata metadata, HttpServletRequest request,
       HttpServletResponse response) throws IOException {
     log.info(
-        "You asked for me to PUT: " + metadata + " to the namespace " + request.getRequestURI());
+        "You asked for me to PUT: " + metadata + " to the namespace " + getTrimmedPath(request));
 
     return metadataService.setMetadataForNamespace(metadata, getTrimmedPath(request));
   }
@@ -51,7 +51,7 @@ public class MetadataController {
   public @ResponseBody Metadata patchData(@RequestBody Metadata metadata,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info(
-        "You asked for me to PATCH: " + metadata + " to the namespace " + request.getRequestURI());
+        "You asked for me to PATCH: " + metadata + " to the namespace " + getTrimmedPath(request));
 
     return metadataService.patchMetadataForNamespace(metadata, getTrimmedPath(request));
   }
