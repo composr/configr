@@ -10,6 +10,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import com.citihub.configr.exception.ConflictException;
 import com.citihub.configr.exception.NotFoundException;
+import com.citihub.configr.exception.SchemaValidationException;
+import com.citihub.configr.metadata.Metadata;
+import com.citihub.configr.metadata.Metadata.ValidationLevel;
+import com.citihub.configr.metadata.SchemaValidationResult;
+import com.citihub.configr.metadata.SchemaValidationService;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.version.Version;
@@ -30,11 +35,15 @@ public class NamespaceService {
 
   private ObjectMapper objectMapper;
 
+  private SchemaValidationService schemaValidationService;
+
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
-      @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper) {
+      @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper,
+      @Autowired SchemaValidationService schemaValidationService) {
     this.configRepo = configRepo;
     this.mongoOperations = nsQueries;
     this.objectMapper = objectMapper;
+    this.schemaValidationService = schemaValidationService;
   }
 
   public @NonNull Namespace fetchNamespace(String fullPath) {
@@ -68,6 +77,11 @@ public class NamespaceService {
       boolean shouldReplace) throws JsonMappingException, JsonParseException, IOException {
 
     Namespace materialized = materialize(json, split(path));
+
+    // TODO: Should we validate here, or after record is found in DB?
+    // TODO: How do we validate a namespace during insertion?
+    validateNamespace(materialized);
+
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if (extant.isPresent()) {
       Namespace existing = configRepo.findById(materialized.getNamespace()).get();
@@ -75,6 +89,45 @@ public class NamespaceService {
           shouldReplace);
     } else {
       return versionAndSave(materialized, null, hashNamespace(materialized));
+    }
+  }
+
+  private void validateNamespace(Namespace namespace)
+      throws SchemaValidationException, JsonProcessingException {
+
+    // TODO: Should we use metadataService.getMetadataForNamespace ?
+    // or will namespace.getMetadata() perform lazy loading?
+    Metadata metadata = namespace.getMetadata();
+    if (metadata == null) {
+      // TODO: Do we ignore validation if there is no metadata? This could
+      // happen during initial insertion.
+      return;
+    }
+
+    ValidationLevel validationLevel = metadata.getValidationLevel();
+    String schema = metadata.getSchema();
+
+    if (validationLevel == ValidationLevel.NONE) {
+      return;
+    }
+
+    SchemaValidationResult result = this.schemaValidationService
+        .validateJSON(objectMapper.writeValueAsString(namespace.getValue()), schema);
+
+
+    switch (validationLevel) {
+      case STRICT:
+        if (!result.isSuccess()) {
+          throw new SchemaValidationException(result.getMessage());
+        }
+        break;
+      case LOOSE:
+        // TODO: What should we do here?
+        // - Save and mark as "invalid schema" in metadata?
+        // - Return diff http status code?
+        break;
+      default:
+        break;
     }
   }
 
