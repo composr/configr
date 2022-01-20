@@ -13,6 +13,7 @@ import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.exception.SchemaValidationException;
 import com.citihub.configr.metadata.Metadata;
 import com.citihub.configr.metadata.Metadata.ValidationLevel;
+import com.citihub.configr.metadata.MetadataService;
 import com.citihub.configr.metadata.SchemaValidationResult;
 import com.citihub.configr.metadata.SchemaValidationService;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
@@ -37,13 +38,17 @@ public class NamespaceService {
 
   private SchemaValidationService schemaValidationService;
 
+  private MetadataService metadataService;
+
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
       @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper,
-      @Autowired SchemaValidationService schemaValidationService) {
+      @Autowired SchemaValidationService schemaValidationService,
+      @Autowired MetadataService metadataService) {
     this.configRepo = configRepo;
     this.mongoOperations = nsQueries;
     this.objectMapper = objectMapper;
     this.schemaValidationService = schemaValidationService;
+    this.metadataService = metadataService;
   }
 
   public @NonNull Namespace fetchNamespace(String fullPath) {
@@ -78,8 +83,6 @@ public class NamespaceService {
 
     Namespace materialized = materialize(json, split(path));
 
-    // TODO: Should we validate here, or after record is found in DB?
-    // TODO: How do we validate a namespace during insertion?
     validateNamespace(materialized);
 
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
@@ -95,25 +98,20 @@ public class NamespaceService {
   private void validateNamespace(Namespace namespace)
       throws SchemaValidationException, JsonProcessingException {
 
-    // TODO: Should we use metadataService.getMetadataForNamespace ?
-    // or will namespace.getMetadata() perform lazy loading?
-    Metadata metadata = namespace.getMetadata();
-    if (metadata == null) {
-      // TODO: Do we ignore validation if there is no metadata? This could
-      // happen during initial insertion.
+    Optional<Metadata> metadata = metadataService.getMetadataForNamespace(namespace.getNamespace());
+
+    if (!metadata.isPresent()) {
       return;
     }
 
-    ValidationLevel validationLevel = metadata.getValidationLevel();
-    String schema = metadata.getSchema();
+    ValidationLevel validationLevel = metadata.get().getValidationLevel();
 
     if (validationLevel == ValidationLevel.NONE) {
       return;
     }
 
-    SchemaValidationResult result = this.schemaValidationService
-        .validateJSON(objectMapper.writeValueAsString(namespace.getValue()), schema);
-
+    SchemaValidationResult result = this.schemaValidationService.validateJSON(
+        objectMapper.writeValueAsString(namespace.getValue()), metadata.get().getSchema());
 
     switch (validationLevel) {
       case STRICT:
@@ -122,9 +120,8 @@ public class NamespaceService {
         }
         break;
       case LOOSE:
-        // TODO: What should we do here?
-        // - Save and mark as "invalid schema" in metadata?
-        // - Return diff http status code?
+        // TODO: Set a custom response header, X-Schema-Validation and just do something basic, e.g.
+        // "{"valid": false }"
         break;
       default:
         break;
