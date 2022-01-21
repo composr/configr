@@ -1,6 +1,8 @@
 package com.citihub.configr.metadata;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +16,40 @@ public class Metadata {
     NONE, STRICT, LOOSE
   }
 
+  public String id;
+
   private String description;
-  private List<ACL> acls;
+  private Set<ACL> acls;
+
   private String schema;
   private ValidationLevel validationLevel;
 
-  private String[] tags;
+  private Set<String> tags;
 
+  public void merge(Metadata copy) {
+    if (!Strings.isNullOrEmpty(copy.getDescription()))
+      this.description = copy.getDescription();
+
+    if (!Strings.isNullOrEmpty(copy.getSchema()))
+      this.schema = copy.getSchema();
+
+    if (copy.getValidationLevel() != null)
+      this.validationLevel = copy.getValidationLevel();
+
+    nullSafeMergeSets(this, copy);
+  }
+
+  private void nullSafeMergeSets(Metadata to, Metadata from) {
+    if (to.getAcls() == null) {
+      if (from.getAcls() != null)
+        to.setAcls(new HashSet<ACL>(from.getAcls()));
+    } else if (from.getAcls() != null)
+      to.getAcls().addAll(from.getAcls());
+
+    if (to.getTags() == null) {
+      if (from.getTags() != null)
+        to.setTags(new HashSet<String>(from.getTags()));
+    } else if (from.getTags() != null)
+      to.getTags().addAll(from.getTags());
+  }
 }

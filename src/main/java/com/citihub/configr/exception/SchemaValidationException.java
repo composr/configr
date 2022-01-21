@@ -6,9 +6,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class SchemaValidationException extends HttpClientErrorException {
 
   public SchemaValidationException(String validationError) {
-    super(HttpStatus.INTERNAL_SERVER_ERROR,
-        "Schema validation failed: "
-    		+ validationError);
+    super(HttpStatus.UNPROCESSABLE_ENTITY, "Schema validation failed: " + validationError);
   }
 
 }

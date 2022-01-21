@@ -10,6 +10,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import com.citihub.configr.exception.ConflictException;
 import com.citihub.configr.exception.NotFoundException;
+import com.citihub.configr.exception.SchemaValidationException;
+import com.citihub.configr.metadata.Metadata;
+import com.citihub.configr.metadata.Metadata.ValidationLevel;
+import com.citihub.configr.metadata.MetadataService;
+import com.citihub.configr.metadata.SchemaValidationResult;
+import com.citihub.configr.metadata.SchemaValidationService;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.version.Version;
@@ -24,17 +30,25 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class NamespaceService {
 
-  private MongoOperations nsQueries;
+  private MongoOperations mongoOperations;
 
   private MongoConfigRepository configRepo;
 
   private ObjectMapper objectMapper;
 
+  private SchemaValidationService schemaValidationService;
+
+  private MetadataService metadataService;
+
   public NamespaceService(@Autowired MongoConfigRepository configRepo,
-      @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper) {
+      @Autowired MongoOperations nsQueries, @Autowired ObjectMapper objectMapper,
+      @Autowired SchemaValidationService schemaValidationService,
+      @Autowired MetadataService metadataService) {
     this.configRepo = configRepo;
-    this.nsQueries = nsQueries;
+    this.mongoOperations = nsQueries;
     this.objectMapper = objectMapper;
+    this.schemaValidationService = schemaValidationService;
+    this.metadataService = metadataService;
   }
 
   public @NonNull Namespace fetchNamespace(String fullPath) {
@@ -68,6 +82,9 @@ public class NamespaceService {
       boolean shouldReplace) throws JsonMappingException, JsonParseException, IOException {
 
     Namespace materialized = materialize(json, split(path));
+
+    NamespaceValidationResult validationResult = validateNamespace(materialized);
+
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if (extant.isPresent()) {
       Namespace existing = configRepo.findById(materialized.getNamespace()).get();
@@ -76,6 +93,42 @@ public class NamespaceService {
     } else {
       return versionAndSave(materialized, null, hashNamespace(materialized));
     }
+  }
+
+  public NamespaceValidationResult validateNamespace(Namespace namespace)
+      throws SchemaValidationException, JsonProcessingException {
+
+    Optional<Metadata> metadata = metadataService.getMetadataForNamespace(namespace.getNamespace());
+
+    if (!metadata.isPresent()) {
+      return NamespaceValidationResult.SKIPPED;
+    }
+
+    ValidationLevel validationLevel = metadata.get().getValidationLevel();
+
+    if (validationLevel == ValidationLevel.NONE) {
+      return NamespaceValidationResult.SKIPPED;
+    }
+
+    SchemaValidationResult result = this.schemaValidationService.validateJSON(
+        objectMapper.writeValueAsString(namespace.getValue()), metadata.get().getSchema());
+
+    switch (validationLevel) {
+      case STRICT:
+        if (!result.isSuccess()) {
+          throw new SchemaValidationException(result.getMessage());
+        }
+        break;
+      case LOOSE:
+        // TODO: Set a custom response header, X-Schema-Validation and just do something basic,
+        // e.g. "{"valid": false }"
+        // Should we do this somewhere else higher in the request chain? It sounds like that would
+        // be too much responsibility for this method IMO.
+        break;
+    }
+
+    return (result.isSuccess()) ? NamespaceValidationResult.SUCCEEDED
+        : NamespaceValidationResult.FAILED;
   }
 
   private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS, Namespace existing,
@@ -107,7 +160,7 @@ public class NamespaceService {
   }
 
   Namespace versionAndSave(Namespace ns, Namespace oldVersion, String newHash) {
-    nsQueries.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
+    mongoOperations.saveAsOldVersion(Optional.ofNullable(oldVersion), ns);
     ns.setVersion(new Version(newHash, "Willy Wonka"));
     return configRepo.save(ns);
   }
@@ -135,7 +188,7 @@ public class NamespaceService {
   }
 
   Namespace findNamespaceOrThrowException(String fullPath) {
-    Namespace ns = nsQueries.findByPath(fullPath);
+    Namespace ns = mongoOperations.findByPath(fullPath);
     if (ns == null)
       throw new NotFoundException();
     return ns;
