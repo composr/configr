@@ -83,7 +83,7 @@ public class NamespaceService {
 
     Namespace materialized = materialize(json, split(path));
 
-    validateNamespace(materialized);
+    NamespaceValidationResult validationResult = validateNamespace(materialized);
 
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if (extant.isPresent()) {
@@ -95,19 +95,19 @@ public class NamespaceService {
     }
   }
 
-  private void validateNamespace(Namespace namespace)
+  public NamespaceValidationResult validateNamespace(Namespace namespace)
       throws SchemaValidationException, JsonProcessingException {
 
     Optional<Metadata> metadata = metadataService.getMetadataForNamespace(namespace.getNamespace());
 
     if (!metadata.isPresent()) {
-      return;
+      return NamespaceValidationResult.SKIPPED;
     }
 
     ValidationLevel validationLevel = metadata.get().getValidationLevel();
 
     if (validationLevel == ValidationLevel.NONE) {
-      return;
+      return NamespaceValidationResult.SKIPPED;
     }
 
     SchemaValidationResult result = this.schemaValidationService.validateJSON(
@@ -120,12 +120,15 @@ public class NamespaceService {
         }
         break;
       case LOOSE:
-        // TODO: Set a custom response header, X-Schema-Validation and just do something basic, e.g.
-        // "{"valid": false }"
-        break;
-      default:
+        // TODO: Set a custom response header, X-Schema-Validation and just do something basic,
+        // e.g. "{"valid": false }"
+        // Should we do this somewhere else higher in the request chain? It sounds like that would
+        // be too much responsibility for this method IMO.
         break;
     }
+
+    return (result.isSuccess()) ? NamespaceValidationResult.SUCCEEDED
+        : NamespaceValidationResult.FAILED;
   }
 
   private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS, Namespace existing,
