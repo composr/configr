@@ -18,7 +18,9 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class SchemaValidationService {
 

@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,9 +38,6 @@ public class TestNSServiceValidations extends UnitTest {
 
   private final String TEST_JSON =
       "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
-
-  @BeforeAll
-  public void setup() throws Exception {}
 
   @Mock
   private MongoConfigRepository configRepo;

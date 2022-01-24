@@ -13,7 +13,7 @@ public class URIValidationInterceptor implements HandlerInterceptor {
    * Allows the base routes plus swagger/openapi endpoints
    */
   private final String VALID_URI_REGEX =
-      "/{1}(configuration/.+|metadata/.+|version/.+|v3/.*|swagger-ui/.*|swagger-ui.html|query.*)";
+      "/{1}(configuration/.+|metadata/.+|validity/.+|version/.+|v3/.*|swagger-ui/.*|swagger-ui.html|query.*)";
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

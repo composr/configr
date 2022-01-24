@@ -31,16 +31,15 @@ public class SchemaController {
   }
 
   @PreAuthorize("@authorizer.canWrite()")
-  @GetMapping(consumes = {"application/json", "application/yaml", "application/yml"}, value = "/**",
-      produces = {MediaType.APPLICATION_JSON_VALUE})
-  public @ResponseBody String validateNamespace(HttpServletRequest request,
+  @GetMapping(value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
+  public @ResponseBody SchemaValidationResult validateNamespace(HttpServletRequest request,
       HttpServletResponse response) throws IOException {
     log.info("You asked for me to GET validity of: " + getTrimmedPath(request));
     String namespace = getTrimmedPath(request);
 
     Namespace ns = namespaceService.fetchNamespace(namespace);
     Optional<SchemaValidationResult> result = schemaValidationService.getValidationReport(ns);
-    return result.get().getReport().toString();
+    return result.get();
   }
 
   String getTrimmedPath(HttpServletRequest request) {
