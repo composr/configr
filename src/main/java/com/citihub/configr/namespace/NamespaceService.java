@@ -8,16 +8,15 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import com.citihub.configr.exception.ConflictException;
 import com.citihub.configr.exception.NotFoundException;
-import com.citihub.configr.exception.SchemaValidationException;
-import com.citihub.configr.metadata.Metadata;
-import com.citihub.configr.metadata.Metadata.ValidationLevel;
 import com.citihub.configr.metadata.MetadataService;
 import com.citihub.configr.metadata.SchemaValidationResult;
-import com.citihub.configr.metadata.SchemaValidationService;
 import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
+import com.citihub.configr.schema.SchemaValidationService;
 import com.citihub.configr.version.Version;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -83,7 +82,7 @@ public class NamespaceService {
 
     Namespace materialized = materialize(json, split(path));
 
-    NamespaceValidationResult validationResult = validateNamespace(materialized);
+    validateAgainstSchema(materialized);
 
     Optional<Namespace> extant = configRepo.findById(materialized.getNamespace());
     if (extant.isPresent()) {
@@ -95,40 +94,13 @@ public class NamespaceService {
     }
   }
 
-  public NamespaceValidationResult validateNamespace(Namespace namespace)
-      throws SchemaValidationException, JsonProcessingException {
+  private void validateAgainstSchema(Namespace materialized) throws JsonProcessingException {
+    Optional<SchemaValidationResult> result =
+        schemaValidationService.getValidationReport(materialized);
 
-    Optional<Metadata> metadata = metadataService.getMetadataForNamespace(namespace.getNamespace());
-
-    if (!metadata.isPresent()) {
-      return NamespaceValidationResult.SKIPPED;
-    }
-
-    ValidationLevel validationLevel = metadata.get().getValidationLevel();
-
-    if (validationLevel == ValidationLevel.NONE) {
-      return NamespaceValidationResult.SKIPPED;
-    }
-
-    SchemaValidationResult result = this.schemaValidationService.validateJSON(
-        objectMapper.writeValueAsString(namespace.getValue()), metadata.get().getSchema());
-
-    switch (validationLevel) {
-      case STRICT:
-        if (!result.isSuccess()) {
-          throw new SchemaValidationException(result.getMessage());
-        }
-        break;
-      case LOOSE:
-        // TODO: Set a custom response header, X-Schema-Validation and just do something basic,
-        // e.g. "{"valid": false }"
-        // Should we do this somewhere else higher in the request chain? It sounds like that would
-        // be too much responsibility for this method IMO.
-        break;
-    }
-
-    return (result.isSuccess()) ? NamespaceValidationResult.SUCCEEDED
-        : NamespaceValidationResult.FAILED;
+    if (result.isPresent() && !result.get().isSuccess())
+      ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse()
+          .addHeader("X-Schema-Validity", "false");
   }
 
   private Namespace mergeReplaceSave(Namespace materialized, Namespace newNS, Namespace existing,

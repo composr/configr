@@ -1,4 +1,4 @@
-package com.citihub.configr.metadata;
+package com.citihub.configr.schema;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import com.citihub.configr.base.UnitTest;
 import com.citihub.configr.exception.SchemaValidationException;
+import com.citihub.configr.metadata.SchemaValidationResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SchemaValidationServiceTest extends UnitTest {
@@ -28,7 +29,7 @@ public class SchemaValidationServiceTest extends UnitTest {
   @BeforeAll
   public void setup() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
-    validationService = new SchemaValidationService(mapper);
+    validationService = new SchemaValidationService(mapper, null);
     this.workingDir = Path.of("", "src/test/resources");
     this.jsonSchema = readResource("jsonSchema.json");
     this.jsonValid = readResource("jsonValidSchema.json");
