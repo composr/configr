@@ -1,5 +1,6 @@
 package com.citihub.configr.metadata;
 
+import com.github.fge.jsonschema.core.report.ProcessingReport;
 import lombok.Data;
 
 @Data
@@ -7,11 +8,11 @@ public class SchemaValidationResult {
 
   private boolean isSuccess;
 
-  private String message;
+  private ProcessingReport report;
 
-  public SchemaValidationResult(boolean isSuccess, String message) {
+  public SchemaValidationResult(boolean isSuccess, ProcessingReport report) {
     this.isSuccess = isSuccess;
-    this.message = message;
+    this.report = report;
   }
 
 }
