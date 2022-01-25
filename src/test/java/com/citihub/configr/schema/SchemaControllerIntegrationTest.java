@@ -24,9 +24,7 @@ import com.citihub.configr.metadata.MetadataService;
 import com.citihub.configr.metadata.SchemaValidationResult;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.namespace.NamespaceService;
-import com.github.fge.jsonschema.core.report.AbstractProcessingReport;
-import com.github.fge.jsonschema.core.report.LogLevel;
-import com.github.fge.jsonschema.core.report.ProcessingMessage;
+import com.github.fge.jsonschema.core.report.ListProcessingReport;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 
 public class SchemaControllerIntegrationTest extends IntegrationTest {
@@ -91,22 +89,13 @@ public class SchemaControllerIntegrationTest extends IntegrationTest {
   }
 
   ProcessingReport getEmptyReport() {
-    return new EmptyProcessingReport();
+    return new ListProcessingReport();
   }
 
   @BeforeEach
   public void setup() {
     Mockito.reset(metadataService, namespaceService);
     mockNamespace();
-  }
-
-  /**
-   * This has to be its own actual Class instead of an inline implementation so it has a
-   * CanonicalName - without which an NPE will be thrown from the toString(). boo.
-   */
-  private class EmptyProcessingReport extends AbstractProcessingReport {
-    @Override
-    public void log(LogLevel level, ProcessingMessage message) {}
   }
 
   @Test

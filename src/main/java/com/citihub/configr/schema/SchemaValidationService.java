@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ListProcessingReport;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -66,7 +67,13 @@ public class SchemaValidationService {
     SchemaValidationResult result = validateJSON(nsJson, metadata.getSchema());
 
     if (!result.isSuccess() && metadata.getValidationLevel() == ValidationLevel.STRICT) {
-      throw new SchemaValidationException(result.getReport().toString());
+      try {
+        throw new SchemaValidationException(
+            objectMapper.writeValueAsString(((ListProcessingReport) result.getReport()).asJson()));
+      } catch (JsonProcessingException e) {
+        throw new SchemaValidationException(result.getReport().toString());
+      }
+
     }
 
     return Optional.of(result);
