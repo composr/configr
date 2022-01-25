@@ -38,12 +38,14 @@ public class SchemaController {
     String namespace = getTrimmedPath(request);
 
     Namespace ns = namespaceService.fetchNamespace(namespace);
+    log.info("Got namespace to validate: {} ", ns);
     Optional<SchemaValidationResult> result = schemaValidationService.getValidationReport(ns);
+    log.info("Result? {} ", result);
     return result.get();
   }
 
   String getTrimmedPath(HttpServletRequest request) {
-    return request.getRequestURI().replace("/metadata/schema", "");
+    return request.getRequestURI().replace("/validity", "");
   }
 
 }

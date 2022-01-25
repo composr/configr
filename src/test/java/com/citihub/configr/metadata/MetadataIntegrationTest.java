@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -60,9 +61,8 @@ public class MetadataIntegrationTest extends IntegrationTest {
 
   @BeforeEach
   public void setupMock() {
-    System.out.println("Setting up!");
-    testMetadata =
-        new Metadata("/x", "the", testACLSet, "empty schema", ValidationLevel.NONE, testTagSet);
+    testMetadata = new Metadata("/x", "the", testACLSet,
+        Collections.singletonMap("message", "I am a schema"), ValidationLevel.NONE, testTagSet);
 
     when(metadataRepository.save(any(Metadata.class))).thenAnswer(new Answer<Metadata>() {
       public Metadata answer(InvocationOnMock invocation) throws Throwable {
@@ -86,8 +86,8 @@ public class MetadataIntegrationTest extends IntegrationTest {
     mergeTagSet.add("is");
     mergeTagSet.addAll(testTagSet);
 
-    Metadata expectedMetadata =
-        new Metadata("/x", "the", testACLSet, "bobbo", ValidationLevel.NONE, mergeTagSet);
+    Metadata expectedMetadata = new Metadata("/x", "the", testACLSet,
+        Collections.singletonMap("message", "I am a schema"), ValidationLevel.NONE, mergeTagSet);
 
     String expectedResult = mapper.writeValueAsString(expectedMetadata);
 
@@ -105,8 +105,8 @@ public class MetadataIntegrationTest extends IntegrationTest {
 
   @Test
   public void testPut() throws Exception {
-    testMetadata =
-        new Metadata("/x", "the", testACLSet, "empty schema", ValidationLevel.NONE, testTagSet);
+    testMetadata = new Metadata("/x", "the", testACLSet,
+        Collections.singletonMap("message", "I am a schema"), ValidationLevel.NONE, testTagSet);
 
     mockMvc
         .perform(put("/metadata/x").content(mapper.writeValueAsString(testMetadata))

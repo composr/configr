@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import com.citihub.configr.base.UnitTest;
@@ -77,7 +78,16 @@ public class SchemaValidationServiceTest extends UnitTest {
   @Test
   public void testValidateJSONWithNullsShallRaiseException() {
 
-    assertThrows(SchemaValidationException.class, () -> validationService.validateJSON(null, null));
+    assertThrows(SchemaValidationException.class,
+        () -> validationService.validateJSON(null, (Map<String, Object>) null));
+
+  }
+
+  @Test
+  public void testValidateJSONWithNullStringsShallRaiseException() {
+
+    assertThrows(SchemaValidationException.class,
+        () -> validationService.validateJSON("foo", (String) null));
 
   }
 
@@ -93,7 +103,7 @@ public class SchemaValidationServiceTest extends UnitTest {
   public void testValidateJSONWithNullSchemaShallRaiseException() {
 
     assertThrows(SchemaValidationException.class,
-        () -> validationService.validateJSON(jsonValid, null));
+        () -> validationService.validateJSON(jsonValid, (Map<String, Object>) null));
 
   }
 

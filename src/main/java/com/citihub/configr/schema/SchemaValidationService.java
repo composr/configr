@@ -1,6 +1,7 @@
 package com.citihub.configr.schema;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -53,7 +53,7 @@ public class SchemaValidationService {
   }
 
   private boolean hasSchema(Optional<Metadata> metadata) {
-    return metadata.isPresent() && !Strings.isNullOrEmpty(metadata.get().getSchema());
+    return metadata.isPresent() && metadata.get().getSchema() != null;
   }
 
   public Optional<SchemaValidationResult> getValidationReport(String nsJson, Metadata metadata)
@@ -72,9 +72,19 @@ public class SchemaValidationService {
     return Optional.of(result);
   }
 
+  public SchemaValidationResult validateJSON(final String json, final Map<String, Object> schema)
+      throws SchemaValidationException {
+    try {
+      return validateJSON(json, objectMapper.writeValueAsString(schema));
+    } catch (JsonProcessingException e) {
+      throw new SchemaValidationException("JSON schema is syntactically invalid.");
+    }
+  }
+
   public SchemaValidationResult validateJSON(final String json, final String schema)
       throws SchemaValidationException {
-    System.out.println(json + " and " + schema);
+    log.info("Validating {} against {}", json, schema);
+
     if (json == null || schema == null)
       throw new SchemaValidationException("Inputs cannot be null");
 
@@ -85,6 +95,7 @@ public class SchemaValidationService {
       final JsonSchema jsonSchema = JsonSchemaFactory.byDefault().getJsonSchema(schemaObj);
 
       ProcessingReport report = jsonSchema.validate(jsonObj);
+      log.info("Just validated and got this report {}", report);
 
       return new SchemaValidationResult(report.isSuccess(), report);
 

@@ -72,21 +72,21 @@ public class SchemaControllerIntegrationTest extends IntegrationTest {
   void mockNoValidationMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.NONE);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 
   void mockLooseMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.LOOSE);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 
   void mockStrictMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.STRICT);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 

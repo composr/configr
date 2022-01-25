@@ -75,21 +75,21 @@ public class TestNSServiceValidations extends UnitTest {
   void mockNoValidationMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.NONE);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 
   void mockLooseMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.LOOSE);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 
   void mockStrictMetadata() {
     Metadata metadata = new Metadata();
     metadata.setValidationLevel(ValidationLevel.STRICT);
-    metadata.setSchema("I am a schema");
+    metadata.setSchema(Collections.singletonMap("message", "I am a schema"));
     mockMetadata(Optional.of(metadata));
   }
 
@@ -144,7 +144,7 @@ public class TestNSServiceValidations extends UnitTest {
     SchemaValidationResult successfulValidationResult =
         new SchemaValidationResult(true, getEmptyReport());
     Mockito.doReturn(successfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any());
+        any(Map.class));
 
     Optional<SchemaValidationResult> result =
         schemaValidationService.getValidationReport(getMockedNamespace());
@@ -162,7 +162,7 @@ public class TestNSServiceValidations extends UnitTest {
     SchemaValidationResult unsuccessfulValidationResult =
         new SchemaValidationResult(false, getEmptyReport());
     Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any());
+        any(Map.class));
 
     Optional<SchemaValidationResult> result =
         schemaValidationService.getValidationReport(getMockedNamespace());
@@ -180,7 +180,7 @@ public class TestNSServiceValidations extends UnitTest {
     SchemaValidationResult successfulValidationResult =
         new SchemaValidationResult(true, getEmptyReport());
     Mockito.doReturn(successfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any());
+        any(Map.class));
 
     Optional<SchemaValidationResult> result =
         schemaValidationService.getValidationReport(getMockedNamespace());
@@ -198,7 +198,7 @@ public class TestNSServiceValidations extends UnitTest {
     SchemaValidationResult unsuccessfulValidationResult =
         new SchemaValidationResult(false, getEmptyReport());
     Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any());
+        any(Map.class));
 
     assertThrows(SchemaValidationException.class,
         () -> schemaValidationService.getValidationReport(getMockedNamespace()));
@@ -228,7 +228,7 @@ public class TestNSServiceValidations extends UnitTest {
     SchemaValidationResult unsuccessfulValidationResult =
         new SchemaValidationResult(false, getEmptyReport());
     Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any());
+        any(Map.class));
 
     assertThrows(SchemaValidationException.class, () -> configService
         .storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false));

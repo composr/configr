@@ -1,6 +1,7 @@
 package com.citihub.configr.metadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +26,14 @@ public class TestMetadata extends UnitTest {
     testACLSet = new HashSet<ACL>();
     testACLSet.add(testAcl);
 
-    copy = new Metadata("/x", "the", testACLSet, "empty schema", ValidationLevel.NONE, testTagSet);
+    copy = new Metadata("/x", "the", testACLSet, Collections.EMPTY_MAP, ValidationLevel.NONE,
+        testTagSet);
   }
 
   @Test
   public void testMerge() {
-    Metadata original = new Metadata("/x", "hi", new HashSet<ACL>(), "{}", ValidationLevel.LOOSE,
-        new HashSet<String>());
+    Metadata original = new Metadata("/x", "hi", new HashSet<ACL>(), Collections.EMPTY_MAP,
+        ValidationLevel.LOOSE, new HashSet<String>());
     original.getTags().add("bobbo");
 
     original.merge(copy);
@@ -45,8 +47,8 @@ public class TestMetadata extends UnitTest {
   @Test
   public void testMergeSourceNulls() {
     Metadata original = new Metadata("/x", "hi", null, null, null, null);
-    Metadata expected =
-        new Metadata("/x", "the", testACLSet, "empty schema", ValidationLevel.NONE, testTagSet);
+    Metadata expected = new Metadata("/x", "the", testACLSet, Collections.EMPTY_MAP,
+        ValidationLevel.NONE, testTagSet);
 
     original.merge(copy);
     assertThat(original).isEqualTo(expected);

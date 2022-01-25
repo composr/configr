@@ -1,6 +1,7 @@
 package com.citihub.configr.metadata;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class Metadata {
   private String description;
   private Set<ACL> acls;
 
-  private String schema;
+  private Map<String, Object> schema;
   private ValidationLevel validationLevel;
 
   private Set<String> tags;
@@ -30,7 +31,7 @@ public class Metadata {
     if (!Strings.isNullOrEmpty(copy.getDescription()))
       this.description = copy.getDescription();
 
-    if (!Strings.isNullOrEmpty(copy.getSchema()))
+    if (copy.getSchema() != null)
       this.schema = copy.getSchema();
 
     if (copy.getValidationLevel() != null)
