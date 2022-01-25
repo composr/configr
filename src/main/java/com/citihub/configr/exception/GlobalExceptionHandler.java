@@ -49,6 +49,12 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<String>(ex.getMessage(), HttpStatus.FORBIDDEN);
   }
 
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+  public ResponseEntity<String> handleSchemaValidationFailure(SchemaValidationException ex) {
+    return new ResponseEntity<String>(ex.getStatusText(), HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<String> handleDefaultException(Throwable ex) {
     String errorResponse = "Unknown error occurred.";

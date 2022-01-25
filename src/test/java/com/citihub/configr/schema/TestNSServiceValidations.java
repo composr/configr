@@ -26,10 +26,9 @@ import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.namespace.NamespaceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonschema.core.report.AbstractProcessingReport;
-import com.github.fge.jsonschema.core.report.LogLevel;
-import com.github.fge.jsonschema.core.report.ProcessingMessage;
+import com.github.fge.jsonschema.core.report.ListProcessingReport;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,8 +67,18 @@ public class TestNSServiceValidations extends UnitTest {
     return new Namespace("x", getMockedNamespaceValue(), "/x/y");
   }
 
+  void mockObjectMapperExceptions() throws JsonProcessingException {
+    Mockito.doThrow(JsonProcessingException.class).when(objectMapper).writeValueAsString(any());
+  }
+
   void mockMetadata(Optional<Metadata> metadata) {
     Mockito.when(metadataService.getMetadataForNamespace(any(String.class))).thenReturn(metadata);
+  }
+
+  void mockNoSchemaMetadata() {
+    Metadata metadata = new Metadata();
+    metadata.setValidationLevel(ValidationLevel.NONE);
+    mockMetadata(Optional.of(metadata));
   }
 
   void mockNoValidationMetadata() {
@@ -94,21 +103,37 @@ public class TestNSServiceValidations extends UnitTest {
   }
 
   ProcessingReport getEmptyReport() {
-    return new EmptyProcessingReport();
-  }
-
-  /**
-   * This has to be its own actual Class instead of an inline implementation so it has a
-   * CanonicalName - without which an NPE will be thrown from the toString(). boo.
-   */
-  private class EmptyProcessingReport extends AbstractProcessingReport {
-    @Override
-    public void log(LogLevel level, ProcessingMessage message) {}
+    return new ListProcessingReport();
   }
 
   @BeforeEach
   public void reset() {
     Mockito.reset(schemaValidationService, configService, objectMapper);
+  }
+
+  @Test
+  public void testMetadataWithoutSchema() throws Exception {
+    mockNoSchemaMetadata();
+
+    assertThat(schemaValidationService.getValidationReport(getMockedNamespace())).isEmpty();
+  }
+
+  @Test
+  public void testProcessingExceptionWithMapSchema() throws Exception {
+    mockObjectMapperExceptions();
+
+    assertThrows(SchemaValidationException.class,
+        () -> schemaValidationService.validateJSON("json", Collections.EMPTY_MAP));
+  }
+
+  @Test
+  public void testProcessingExceptionGettingReport() throws Exception {
+    mockObjectMapperExceptions();
+    mockStrictMetadata();
+    mockUnsuccessfulReportResult();
+
+    assertThrows(SchemaValidationException.class,
+        () -> schemaValidationService.getValidationReport("json", "schema"));
   }
 
   @Test
@@ -159,14 +184,18 @@ public class TestNSServiceValidations extends UnitTest {
     mockLooseMetadata();
 
     // Simulating invalid json
-    SchemaValidationResult unsuccessfulValidationResult =
-        new SchemaValidationResult(false, getEmptyReport());
-    Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any(Map.class));
+    mockUnsuccessfulReportResult();
 
     Optional<SchemaValidationResult> result =
         schemaValidationService.getValidationReport(getMockedNamespace());
     assertThat(result.get().isSuccess()).isFalse();
+  }
+
+  private void mockUnsuccessfulReportResult() {
+    SchemaValidationResult unsuccessfulValidationResult =
+        new SchemaValidationResult(false, getEmptyReport());
+    Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
+        any(Map.class));
   }
 
 
@@ -194,11 +223,7 @@ public class TestNSServiceValidations extends UnitTest {
 
     mockStrictMetadata();
 
-    // Simulating invalid json
-    SchemaValidationResult unsuccessfulValidationResult =
-        new SchemaValidationResult(false, getEmptyReport());
-    Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any(Map.class));
+    mockUnsuccessfulReportResult();
 
     assertThrows(SchemaValidationException.class,
         () -> schemaValidationService.getValidationReport(getMockedNamespace()));
@@ -225,10 +250,7 @@ public class TestNSServiceValidations extends UnitTest {
 
     mockStrictMetadata();
 
-    SchemaValidationResult unsuccessfulValidationResult =
-        new SchemaValidationResult(false, getEmptyReport());
-    Mockito.doReturn(unsuccessfulValidationResult).when(schemaValidationService).validateJSON(any(),
-        any(Map.class));
+    mockUnsuccessfulReportResult();
 
     assertThrows(SchemaValidationException.class, () -> configService
         .storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false));

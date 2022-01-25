@@ -38,22 +38,18 @@ public class SchemaValidationServiceTest extends UnitTest {
 
   @Test
   public void testValidateJSONWithInvalidMinimumShallFail() throws Exception {
-
     SchemaValidationResult result = validationService
         .validateJSON(readResource("jsonInvalidMinimumPriceValue.json"), jsonSchema);
 
     assertThat(result.isSuccess()).isFalse();
-
   }
 
   @Test
   public void testValidateJSONWithInvalidTypeShallFail() throws Exception {
-
     SchemaValidationResult result =
         validationService.validateJSON(readResource("jsonInvalidIDType.json"), jsonSchema);
 
     assertThat(result.isSuccess()).isFalse();
-
   }
 
   @Test
