@@ -32,7 +32,7 @@ public class NamespaceController {
   @GetMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Map<String, Object> getData(HttpServletRequest request,
       HttpServletResponse response) {
-    return configurationService.fetchNamespaceBodyByPath(getTrimmedPath(request));
+    return configurationService.getNamespaceValue(getTrimmedPath(request));
   }
 
   @PreAuthorize("@authorizer.canWrite()")
@@ -42,7 +42,7 @@ public class NamespaceController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to POST: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), false, false);
+    return configurationService.storeNamespaceValue(json, getTrimmedPath(request), false, false);
   }
 
   @PreAuthorize("@authorizer.canWrite()")
@@ -52,7 +52,7 @@ public class NamespaceController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), false, true);
+    return configurationService.storeNamespaceValue(json, getTrimmedPath(request), false, true);
   }
 
   @PreAuthorize("@authorizer.canWrite()")
@@ -62,7 +62,7 @@ public class NamespaceController {
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     log.info("You asked for me to PATCH: " + json + " to the namespace " + request.getRequestURI());
 
-    return configurationService.storeNamespace(json, getTrimmedPath(request), true, true);
+    return configurationService.storeNamespaceValue(json, getTrimmedPath(request), true, true);
   }
 
   String getTrimmedPath(HttpServletRequest request) {

@@ -33,7 +33,7 @@ public class QueryController {
   public @ResponseBody Map<String, Object> getData(@RequestParam String jsonPath,
       HttpServletRequest request, HttpServletResponse response) {
     JsonPath jsonPathCompiled = JsonPath.compile(jsonPath);
-    Map<String, Object> json = namespaceService.fetchNamespaceBodyByPath(getTrimmedPath(request));
+    Map<String, Object> json = namespaceService.getNamespaceValue(getTrimmedPath(request));
     return wrapResults(jsonPathCompiled, json);
   }
 
@@ -46,7 +46,7 @@ public class QueryController {
   public @ResponseBody Map<String, Object> postQuery(@RequestBody String query,
       HttpServletRequest request, HttpServletResponse response) {
     JsonPath jsonPath = JsonPath.compile(query);
-    Map<String, Object> json = namespaceService.fetchNamespaceBodyByPath(getTrimmedPath(request));
+    Map<String, Object> json = namespaceService.getNamespaceValue(getTrimmedPath(request));
     return wrapResults(jsonPath, json);
   }
 

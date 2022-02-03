@@ -10,12 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import com.citihub.configr.base.UnitTest;
 import com.citihub.configr.exception.NotFoundException;
 import com.citihub.configr.metadata.MetadataService;
-import com.citihub.configr.mongostorage.MongoConfigRepository;
 import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.schema.SchemaValidationService;
+import com.citihub.configr.storage.MapOperations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,10 +49,7 @@ public class TestConfigurationService extends UnitTest {
   public void setup() throws Exception {}
 
   @Mock
-  private MongoConfigRepository configRepo;
-
-  @Mock
-  private MongoOperations nsQueries;
+  private MongoTemplate mongoTemplate;
 
   @Mock
   private MetadataService metadataService;
@@ -61,6 +59,10 @@ public class TestConfigurationService extends UnitTest {
 
   @Mock
   private ObjectMapper objectMapper;
+
+  @Spy
+  @InjectMocks
+  private MongoOperations mongoOperations;
 
   @Spy
   @InjectMocks
@@ -78,7 +80,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
     Map<String, Object> right = mapper.readValue(MERGE_RIGHT_SAMPLE, new HashMap<>().getClass());
 
-    configService.merge(left, right);
+    MapOperations.merge(left, right);
     assertThat(mapper.writeValueAsString(left)).isEqualTo(TEST_JSON);
   }
 
@@ -113,7 +115,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
     Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
 
-    configService.replace(left, right, new String[] {"x"});
+    MapOperations.replace(left, right, new String[] {"x"});
     assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_ROOT_SAMPLE);
   }
 
@@ -123,7 +125,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
     Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
 
-    configService.replace(left, right, new String[] {"x", "z", "y"});
+    MapOperations.replace(left, right, new String[] {"x", "z", "y"});
     assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_ROOT_SAMPLE);
   }
 
@@ -134,7 +136,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> right =
         mapper.readValue(REPLACE_NULL_OBJECT_RIGHT, new HashMap<>().getClass());
 
-    configService.replace(left, right, new String[] {"x", "z", "heythere", "toast"});
+    MapOperations.replace(left, right, new String[] {"x", "z", "heythere", "toast"});
     log.info("ladi da {}", mapper.writeValueAsString(left));
     assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_NULL_OBJECT_RESULT);
   }
@@ -146,7 +148,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> right =
         mapper.readValue(REPLACE_PRIMITIVE_SAMPLE, new HashMap<>().getClass());
 
-    configService.replace(left, right, new String[] {"x", "a", "f", "boo", "fooz"});
+    MapOperations.replace(left, right, new String[] {"x", "a", "f", "boo", "fooz"});
     assertThat(mapper.writeValueAsString(left)).isEqualTo(REPLACE_PRIMITIVE_RESULT);
   }
 
@@ -158,7 +160,7 @@ public class TestConfigurationService extends UnitTest {
         mapper.readValue(REPLACE_PRIMITIVE_SAMPLE, new HashMap<>().getClass());
 
     boolean result =
-        configService.wouldReplace(left, right, new String[] {"x", "a", "f", "boo", "fooz"});
+        MapOperations.wouldReplace(left, right, new String[] {"x", "a", "f", "boo", "fooz"});
     assertThat(result).isTrue();
   }
 
@@ -168,7 +170,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
     Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
 
-    boolean result = configService.wouldReplace(left, right, new String[] {"x", "z", "y"});
+    boolean result = MapOperations.wouldReplace(left, right, new String[] {"x", "z", "y"});
     assertThat(result).isTrue();
   }
 
@@ -178,7 +180,7 @@ public class TestConfigurationService extends UnitTest {
     Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
     Map<String, Object> right = mapper.readValue(REPLACE_ROOT_SAMPLE, new HashMap<>().getClass());
 
-    boolean result = configService.wouldReplace(left, right, new String[] {"x"});
+    boolean result = MapOperations.wouldReplace(left, right, new String[] {"x"});
     assertThat(result).isTrue();
   }
 
@@ -190,7 +192,7 @@ public class TestConfigurationService extends UnitTest {
         mapper.readValue(REPLACE_NULL_OBJECT_RIGHT, new HashMap<>().getClass());
 
     boolean result =
-        configService.wouldReplace(left, right, new String[] {"x", "z", "heythere", "toast"});
+        MapOperations.wouldReplace(left, right, new String[] {"x", "z", "heythere", "toast"});
     assertThat(result).isFalse();
   }
 
