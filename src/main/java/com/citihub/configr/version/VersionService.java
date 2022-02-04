@@ -5,16 +5,16 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import com.citihub.configr.mongostorage.MongoOperations;
+import com.citihub.configr.storage.StoreOperations;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class VersionService {
 
-  private MongoOperations mongoOperations;
+  private StoreOperations mongoOperations;
 
-  public VersionService(@Autowired MongoOperations mongoOperations) {
+  public VersionService(@Autowired StoreOperations mongoOperations) {
     this.mongoOperations = mongoOperations;
   }
 

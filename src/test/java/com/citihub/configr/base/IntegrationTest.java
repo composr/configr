@@ -21,4 +21,5 @@ import com.citihub.configr.TestMongoConfiguration;
 @Tag("integration")
 @ActiveProfiles("test")
 public class IntegrationTest {
+
 }

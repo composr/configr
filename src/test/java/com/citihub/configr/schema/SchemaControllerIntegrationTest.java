@@ -59,7 +59,7 @@ public class SchemaControllerIntegrationTest extends IntegrationTest {
   }
 
   void mockNamespace() {
-    Mockito.when(namespaceService.fetchNamespace(any()))
+    Mockito.when(namespaceService.getNamespace(any()))
         .thenReturn(new Namespace("x", getMockedNamespaceValue(), "/x/y"));
   }
 

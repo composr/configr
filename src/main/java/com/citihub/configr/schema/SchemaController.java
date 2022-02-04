@@ -37,7 +37,7 @@ public class SchemaController {
     log.info("You asked for me to GET validity of: " + getTrimmedPath(request));
     String namespace = getTrimmedPath(request);
 
-    Namespace ns = namespaceService.fetchNamespace(namespace);
+    Namespace ns = namespaceService.getNamespace(namespace);
     log.info("Got namespace to validate: {} ", ns);
     Optional<SchemaValidationResult> result = schemaValidationService.getValidationReport(ns);
     log.info("Result? {} ", result);

@@ -3,6 +3,7 @@ package com.citihub.configr.schema;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -22,10 +24,9 @@ import com.citihub.configr.metadata.Metadata;
 import com.citihub.configr.metadata.Metadata.ValidationLevel;
 import com.citihub.configr.metadata.MetadataService;
 import com.citihub.configr.metadata.SchemaValidationResult;
-import com.citihub.configr.mongostorage.MongoConfigRepository;
-import com.citihub.configr.mongostorage.MongoOperations;
 import com.citihub.configr.namespace.Namespace;
 import com.citihub.configr.namespace.NamespaceService;
+import com.citihub.configr.storage.StoreOperations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.report.ListProcessingReport;
@@ -39,16 +40,16 @@ public class TestNSServiceValidations extends UnitTest {
       "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}},\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
 
   @Mock
-  private MongoConfigRepository configRepo;
-
-  @Mock
-  private MongoOperations nsQueries;
+  private MongoTemplate mongoTemplate;
 
   @Mock
   private MetadataService metadataService;
 
   @Spy
   private ObjectMapper objectMapper;
+
+  @Mock
+  private StoreOperations mongoOperations;
 
   @Spy
   @InjectMocks
@@ -109,6 +110,7 @@ public class TestNSServiceValidations extends UnitTest {
   @BeforeEach
   public void reset() {
     Mockito.reset(schemaValidationService, configService, objectMapper);
+
   }
 
   @Test
@@ -232,12 +234,12 @@ public class TestNSServiceValidations extends UnitTest {
   @Test
   public void testStoreNamespaceShallCallValidate() throws Exception {
 
+    Mockito.doReturn(getMockedNamespace()).when(mongoOperations).materialize(any(), any());
+
     Mockito.doReturn(Optional.of(new SchemaValidationResult(true, getEmptyReport())))
-        .when(schemaValidationService).getValidationReport(any(Namespace.class));
+        .when(schemaValidationService).getValidationReport(any());
 
-    Mockito.when(configRepo.save(any())).thenReturn(new Namespace());
-
-    configService.storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false);
+    configService.storeNamespaceValue(getMockedNamespaceValue(), "/sampleNamespace", false, false);
 
     // Verify validateNamespace was called
     Mockito.verify(schemaValidationService, Mockito.times(1))
@@ -252,21 +254,23 @@ public class TestNSServiceValidations extends UnitTest {
 
     mockUnsuccessfulReportResult();
 
+    Mockito.doReturn(getMockedNamespace()).when(mongoOperations).materialize(any(), any());
+
     assertThrows(SchemaValidationException.class, () -> configService
-        .storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false));
+        .storeNamespaceValue(getMockedNamespaceValue(), "/sampleNamespace", false, false));
   }
 
   @Test
   public void testStoreNamespaceWithValidationSKIPPEDShallSave() throws Exception {
 
-    Mockito.doReturn(Optional.empty()).when(schemaValidationService)
-        .getValidationReport(any(Namespace.class));
+    Mockito.doReturn(Optional.empty()).when(schemaValidationService).getValidationReport(any());
 
-    // Simulating DB save
-    Mockito.when(configRepo.save(any())).thenReturn(new Namespace());
+    Mockito
+        .when(mongoOperations.saveNamespace(any(String[].class), anyBoolean(), anyBoolean(), any()))
+        .thenReturn(new Namespace());
 
-    Namespace savedNamespace =
-        configService.storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false);
+    Namespace savedNamespace = configService.storeNamespaceValue(getMockedNamespaceValue(),
+        "/sampleNamespace", false, false);
 
     assertThat(savedNamespace).isNotNull();
   }
@@ -275,16 +279,14 @@ public class TestNSServiceValidations extends UnitTest {
   public void testStoreNamespaceWithValidationSUCCEEDEDShallSave() throws Exception {
 
     Mockito.doReturn(Optional.of(new SchemaValidationResult(true, getEmptyReport())))
-        .when(schemaValidationService).getValidationReport(any(Namespace.class));
-    // Mockito.when(objectMapper.writeValueAsString(any())).thenReturn("");
+        .when(schemaValidationService).getValidationReport(any());
 
-    // Simulating DB save
-    Mockito.when(configRepo.save(any())).thenReturn(new Namespace());
+    Mockito.doReturn(getMockedNamespace()).when(mongoOperations).materialize(any(), any());
 
-    Namespace savedNamespace =
-        configService.storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false);
+    configService.storeNamespaceValue(getMockedNamespaceValue(), "/sampleNamespace", false, false);
 
-    assertThat(savedNamespace).isNotNull();
+    Mockito.verify(mongoOperations, Mockito.times(1))
+        .saveNamespace(new String[] {"sampleNamespace"}, false, false, getMockedNamespace());
   }
 
   @Test
@@ -297,9 +299,9 @@ public class TestNSServiceValidations extends UnitTest {
 
     // Simulating skipped validation
     Mockito.doReturn(Optional.of(new SchemaValidationResult(false, getEmptyReport())))
-        .when(schemaValidationService).getValidationReport(any(Namespace.class));
+        .when(schemaValidationService).getValidationReport(any());
 
-    configService.storeNamespace(getMockedNamespaceValue(), "/sampleNamespace", false, false);
+    configService.storeNamespaceValue(getMockedNamespaceValue(), "/sampleNamespace", false, false);
 
     assertThat(response.getHeader("X-Schema-Validity")).isEqualTo("false");
   }
