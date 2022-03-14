@@ -4,9 +4,12 @@ The Configuration store is an API-driven, hierarchical configuration storage pla
 
 <p align="center">
 
-![build-test](https://github.com/citihub/configr/workflows/build-test/badge.svg)
-[![Apache 2.0](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/citihub/configr/blob/master/LICENSE)
-[![codecov](https://codecov.io/gh/citihub/configr/branch/develop/graph/badge.svg)](https://codecov.io/gh/citihub/configr)
+![build-test](https://github.com/composr/configr/workflows/build-test/badge.svg)
+[![Apache 2.0](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/composr/configr/blob/master/LICENSE)
+[![codecov](https://codecov.io/gh/composr/configr/branch/develop/graph/badge.svg)](https://codecov.io/gh/composr/configr)
+[![Snyk Vulnerabilities](https://snyk.io/test/github/composr/configr/badge.svg)](https://snyk.io/test/github/composr/configr)
+[![Sonarqube Quality Gate](http://carbon-sonar.eastus2.cloudapp.azure.com:9000/api/project_badges/measure?project=configr&metric=alert_status&token=0f73df41ad15b538cdf8ddd6d0099031a4cd345c)](http://carbon-sonar.eastus2.cloudapp.azure.com:9000/dashboard?id=configr)
+
 
 <u>Planned Features</u>
 <ul>
