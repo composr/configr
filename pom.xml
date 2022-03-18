@@ -6,7 +6,7 @@
 	<artifactId>configr</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Configuration Store</name>
-	<packaging>jar</packaging>
+  <packaging>jar</packaging>
 
 	<properties>
 		<spring.framework.version>5.3.9</spring.framework.version>
@@ -16,6 +16,7 @@
 		<azure.ad.starter.version>3.12.0</azure.ad.starter.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<app.profiles>local,dev</app.profiles>
 	</properties>
 
 	<dependencyManagement>
@@ -108,8 +109,24 @@
 			<version>2.2.14</version>
 		</dependency>
 	</dependencies>
-
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.contrastsecurity</groupId>
+					<artifactId>contrast-maven-plugin</artifactId>
+					<version>2.13.2</version>
+					<configuration>
+						<appName>configr</appName>
+						<username>${env.CONTRAST__API__USER_NAME}</username>
+						<apiKey>${env.CONTRAST__API__API_KEY}</apiKey>
+						<serviceKey>${env.CONTRAST__API__SERVICE_KEY}</serviceKey>
+						<orgUuid>${env.CONTRAST__API__ORGANIZATION_ID}</orgUuid>
+						<apiUrl>${env.CONTRAST__API__URL}</apiUrl>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -157,6 +174,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.5.RELEASE</version>
+				<configuration>
+					<profiles>${app.profiles}</profiles>
+				</configuration>
 				<executions>
 					<execution>
 						<configuration>
@@ -167,4 +187,31 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>assess</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.contrastsecurity</groupId>
+						<artifactId>contrast-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>contrast-install</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>contrast-verify</id>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
