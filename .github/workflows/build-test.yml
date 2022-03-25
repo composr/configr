@@ -17,6 +17,12 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots contrast:install verify
+        env:
+          CONTRAST__API__API_KEY: ${{ secrets.CONTRAST__API__API_KEY }}
+          CONTRAST__API__ORGANIZATION_ID: ${{ secrets.CONTRAST__API__ORGANIZATION_ID }}
+          CONTRAST__API__SERVICE_KEY: ${{ secrets.CONTRAST__API__SERVICE_KEY }}
+          CONTRAST__API__URL: ${{ secrets.CONTRAST__API__URL }}
+          CONTRAST__API__USER_NAME: ${{ secrets.CONTRAST__API__USER_NAME }}
       - name: "Codecov upload"
         uses: codecov/codecov-action@v2
         with:
