@@ -122,8 +122,7 @@
 						<serviceKey>${env.CONTRAST__API__SERVICE_KEY}</serviceKey>
 						<orgUuid>${env.CONTRAST__API__ORGANIZATION_ID}</orgUuid>
             <apiUrl>${env.CONTRAST__API__URL}</apiUrl>
-            <serverPath>${env.CONTRAST__SERVER_PATH}</serverPath>
-					</configuration>
+          </configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
