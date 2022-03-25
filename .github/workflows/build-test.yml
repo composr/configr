@@ -25,6 +25,7 @@ jobs:
           CONTRAST__API__SERVICE_KEY: ${{ secrets.CONTRAST__API__SERVICE_KEY }}
           CONTRAST__API__URL: ${{ secrets.CONTRAST__API__URL }}
           CONTRAST__API__USER_NAME: ${{ secrets.CONTRAST__API__USER_NAME }}
+          CONTRAST__CI_ENVIRONMENT: ${{ secrets.CONTRAST__CI_ENVIRONMENT }}
       - name: "Codecov upload"
         uses: codecov/codecov-action@v2
         with:
