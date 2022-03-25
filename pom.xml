@@ -121,9 +121,9 @@
 						<apiKey>${env.CONTRAST__API__API_KEY}</apiKey>
 						<serviceKey>${env.CONTRAST__API__SERVICE_KEY}</serviceKey>
 						<orgUuid>${env.CONTRAST__API__ORGANIZATION_ID}</orgUuid>
-            <apiUrl>${env.CONTRAST__API__URL}</apiUrl>
-            <environment>${env.CONTRAST__CI_ENVIRONMENT}</environment>
-          </configuration>
+                        <apiUrl>${env.CONTRAST__API__URL}</apiUrl>
+                        <environment>${env.CONTRAST__CI_ENVIRONMENT}</environment>
+                    </configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
