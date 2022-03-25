@@ -108,8 +108,24 @@
 			<version>2.2.14</version>
 		</dependency>
 	</dependencies>
-
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.contrastsecurity</groupId>
+					<artifactId>contrast-maven-plugin</artifactId>
+					<version>2.13.2</version>
+					<configuration>
+						<appName>configr</appName>
+						<username>${env.CONTRAST__API__USER_NAME}</username>
+						<apiKey>${env.CONTRAST__API__API_KEY}</apiKey>
+						<serviceKey>${env.CONTRAST__API__SERVICE_KEY}</serviceKey>
+						<orgUuid>${env.CONTRAST__API__ORGANIZATION_ID}</orgUuid>
+						<apiUrl>${env.CONTRAST__API__URL}</apiUrl>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -157,6 +173,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.5.RELEASE</version>
+				<configuration></configuration>
 				<executions>
 					<execution>
 						<configuration>
@@ -167,4 +184,31 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>assess</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.contrastsecurity</groupId>
+						<artifactId>contrast-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>contrast-install</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>contrast-verify</id>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
