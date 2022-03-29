@@ -1,0 +1,6 @@
+agent:
+  java:
+    scan_all_classes: true
+    scan_all_code_sources: true
+  logger:
+    stdout: true
