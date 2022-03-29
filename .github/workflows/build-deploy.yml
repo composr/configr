@@ -45,7 +45,6 @@ jobs:
           ports: 8080
           environment-variables: >
             MONGODB_URI="mongodb://${{ secrets.MONGO_INITDB_ROOT_USERNAME }}:${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}@${{ secrets.MONGO_DEV_URL }}:27017/?authSource=admin&readPreference=primary&appname=configr&ssl=false"
-            _JAVA_TOOL_OPTIONS=-javaagent:contrast.jar
           secure-environment-variables: >
             CONTRAST__API__API_KEY=${{ secrets.CONTRAST__API__API_KEY }}
             CONTRAST__API__ORGANIZATION_ID=${{ secrets.CONTRAST__API__ORGANIZATION_ID }}
