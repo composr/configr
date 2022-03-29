@@ -16,7 +16,7 @@ jobs:
           java-version: '16'
           distribution: 'adopt'
       - name: Setup target dir for Contrast
-        run: mkdir -p /home/runner/work/configr/configr/target/
+        run: mkdir -p /home/runner/work/configr/configr/target
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots contrast:install verify
         env:
