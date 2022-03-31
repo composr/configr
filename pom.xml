@@ -12,7 +12,7 @@
 		<spring.framework.version>5.3.9</spring.framework.version>
 		<spring-boot.version>2.5.4</spring-boot.version>
 		<jacoco.version>0.8.7</jacoco.version>
-		<log4j2.version>2.12.0</log4j2.version>
+		<log4j2.version>2.17.1</log4j2.version>
 		<azure.ad.starter.version>3.12.0</azure.ad.starter.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
