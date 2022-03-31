@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +52,8 @@ public class NamespaceController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Namespace putData(@RequestBody Map<String, Object> json,
       HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Logger l = LogManager.getLogger();
+    l.error("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
     log.info("You asked for me to PUT: " + json + " to the namespace " + request.getRequestURI());
 
     return configurationService.storeNamespaceValue(json, getTrimmedPath(request), false, true);
