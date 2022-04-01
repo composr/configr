@@ -31,7 +31,8 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/configr:${{ github.sha }}
+          export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE="${{ secrets.IMAGE_SIGN_PWD }}"
+          DOCKER_CONTENT_TRUST=1 docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/configr:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/configr:${{ github.sha }}
       - name: 'Deploy to Azure Container Instances'
         uses: 'azure/aci-deploy@v1'
