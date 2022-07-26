@@ -99,7 +99,7 @@ public class MongoOperations implements StoreOperations {
     Object result = MapOperations.delete((Map<String, Object>) ns.getValue(), pathSplit);
 
     if (result != null) {
-      log.error("I deleted {} and am going to save {} back to path {}", result, ns, path);
+      log.debug("I deleted {} and am going to save {} back to path {}", result, ns, path);
       return saveNamespace(pathSplit, false, true, ns);
     } else
       throw new NotFoundException();
