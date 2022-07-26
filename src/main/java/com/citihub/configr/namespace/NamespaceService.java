@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import com.citihub.configr.exception.NotFoundException;
+import com.citihub.configr.exception.SaveFailureException;
 import com.citihub.configr.metadata.SchemaValidationResult;
 import com.citihub.configr.schema.SchemaValidationService;
 import com.citihub.configr.storage.StoreOperations;
@@ -30,6 +31,14 @@ public class NamespaceService {
       @Autowired SchemaValidationService schemaValidationService) {
     this.mongoOperations = mongoOperations;
     this.schemaValidationService = schemaValidationService;
+  }
+
+  public Namespace deleteNamespace(String fullPath) {
+    try {
+      return mongoOperations.deleteByPath(fullPath);
+    } catch (JsonProcessingException e) {
+      throw new SaveFailureException();
+    }
   }
 
   public @NonNull Namespace getNamespace(String fullPath) {

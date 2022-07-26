@@ -89,6 +89,23 @@ public class MongoOperations implements StoreOperations {
   }
 
   @Override
+  public Namespace deleteByPath(String path) throws JsonProcessingException {
+    Namespace ns = findByPath(path);
+    if (ns == null)
+      throw new NotFoundException();
+
+    String[] pathSplit = path.substring(1).split("/");
+
+    Object result = MapOperations.delete((Map<String, Object>) ns.getValue(), pathSplit);
+
+    if (result != null) {
+      log.error("I deleted {} and am going to save {} back to path {}", result, ns, path);
+      return saveNamespace(pathSplit, false, true, ns);
+    } else
+      throw new NotFoundException();
+  }
+
+  @Override
   public Namespace findByPath(String path) {
     String whereClause = "value" + path.replaceAll("\\/", "\\.");
 

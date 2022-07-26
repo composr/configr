@@ -3,6 +3,7 @@ package com.citihub.configr.mongostorage;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,6 +36,13 @@ public class TestSaveConfiguration extends IntegrationTest {
 
   private static final String SAMPLE_CONTENT =
       "{ \"foo\": { \"bar\": { \"baz\": [ { \"buzz\": \"bizz\" }, { \"foo2\": \"bar2\" } ] } } }";
+
+  private final String SAMPLE =
+      "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"foo\":[\"ballz\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}}";
+  private final String DELETE_BOO_FROM_LEFT =
+      "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"ba\":{\"nee\":\"nah\"}}}}}}}";
+
+
 
   @Autowired
   private MockMvc mockMvc;
@@ -104,6 +112,12 @@ public class TestSaveConfiguration extends IntegrationTest {
         .andDo(print()).andExpect(status().isInternalServerError());
 
     Mockito.reset(mongoTemplate);
+  }
+
+  @Test
+  public void testDeleteNotFound() throws Exception {
+    mockMvc.perform(delete("/configuration/a/b/c/its/easy")).andDo(print())
+        .andExpect(status().isNotFound());
   }
 
 }
