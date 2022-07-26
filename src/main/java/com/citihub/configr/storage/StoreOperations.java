@@ -16,6 +16,8 @@ public interface StoreOperations {
 
   List<Document> listVersionsByPath(String path);
 
+  Namespace deleteByPath(String path) throws JsonProcessingException;
+
   Namespace findByPath(String path);
 
   Namespace materialize(Map<String, Object> json, String[] pathTokens);

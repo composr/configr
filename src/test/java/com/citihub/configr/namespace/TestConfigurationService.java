@@ -31,6 +31,9 @@ public class TestConfigurationService extends UnitTest {
   private final String MERGE_RIGHT_SAMPLE =
       "{\"x\":{\"y\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
 
+  private final String DELETE_BOO_FROM_LEFT =
+      "{\"x\":{\"z\":{\"y\":{\"a\":{\"f\":{\"ba\":{\"nee\":\"nah\"}}}}}}}";
+
   private final String REPLACE_ROOT_SAMPLE =
       "{\"x\":{\"z\":{\"a\":{\"f\":{\"boo\":{\"fooz\":[\"ball\",\"bazz\"]},\"ba\":{\"nee\":\"nah\"}}}}}}";
   private final String REPLACE_SMALL_SAMPLE = "{\"x\":{\"a\":{\"f\":{\"boo\":\"fooz\"}}}}";
@@ -196,4 +199,22 @@ public class TestConfigurationService extends UnitTest {
     assertThat(result).isFalse();
   }
 
+  @Test
+  public void testDeleteObject() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+
+    Object result = MapOperations.delete(left, new String[] {"x", "z", "y", "a", "f", "boo"});
+    assertThat(mapper.writeValueAsString(left)).isEqualTo(DELETE_BOO_FROM_LEFT);
+    assertThat(result).isNotNull();
+  }
+
+  @Test
+  public void testDeleteNotFound() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> left = mapper.readValue(MERGE_LEFT_SAMPLE, new HashMap<>().getClass());
+
+    Object result = MapOperations.delete(left, new String[] {"x", "z", "foo"});
+    assertThat(result).isNull();
+  }
 }

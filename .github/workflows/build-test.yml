@@ -31,8 +31,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./target/jacoco-ut/jacoco.xml
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}

@@ -12,12 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TestMongoOperations extends MongoTest {
 
-  private static final String POST_SAVE_CONTENT =
-      "{\"x\":{\"y\":{\"z\":{ \"foo\": { \"bar\": { \"baz\": [ { \"buzz\": \"bizz\" }, { \"foo2\": \"bar2\" } ] } } }}}}";
-
-  private static final String SAMPLE_CONTENT =
-      "{ \"foo\": { \"bar\": { \"baz\": [ { \"buzz\": \"bizz\" }, { \"foo2\": \"bar2\" } ] } } }";
-
   private MongoOperations mongoOps;
 
   @Autowired
@@ -45,4 +39,5 @@ public class TestMongoOperations extends MongoTest {
 
     mongoOps.saveAsOldVersion(Optional.ofNullable(old), new Namespace("foo", "bizz"));
   }
+
 }

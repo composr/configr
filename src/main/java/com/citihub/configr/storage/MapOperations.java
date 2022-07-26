@@ -6,6 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MapOperations {
 
+  public static Object delete(Map<String, Object> mapExtant, String[] path) {
+    Map<String, Object> curValue = mapExtant;
+    for (int i = 0; i <= path.length - 2; i++) {
+      if (curValue != null)
+        if (curValue.get(path[i]) instanceof Map)
+          curValue = (Map<String, Object>) curValue.get(path[i]);
+        else
+          curValue = null;
+      else
+        break;
+      log.info("Traversing with key {} with value {}", path[i], curValue);
+    }
+
+    if (curValue != null) // I found where I'm going to remove, woo hoo
+      return curValue.remove(path[path.length - 1]);
+    else
+      return null;
+  }
+
   public static void merge(Map<String, Object> mapExtant, Map<String, Object> mapNew) {
     for (String key : mapNew.keySet()) {
       if (mapExtant.containsKey(key) && mapExtant.get(key) instanceof Map) {
