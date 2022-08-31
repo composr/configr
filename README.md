@@ -8,7 +8,7 @@ The Configuration store is an API-driven, hierarchical configuration storage pla
 [![Apache 2.0](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/composr/configr/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/composr/configr/branch/develop/graph/badge.svg)](https://codecov.io/gh/composr/configr)
 [![Snyk Vulnerabilities](https://snyk.io/test/github/composr/configr/badge.svg)](https://snyk.io/test/github/composr/configr)
-[![Sonarqube Quality Gate](http://sc-devsecops-sonar.eastus.cloudapp.azure.com:9000/api/project_badges/measure?project=configr&metric=alert_status&token=0f73df41ad15b538cdf8ddd6d0099031a4cd345c)](http://sc-devsecops-sonar.eastus.cloudapp.azure.com:9000/dashboard?id=configr)
+[![Sonarqube Quality Gate](http://sc-devsecops-sonar.eastus.cloudapp.azure.com:9000/api/project_badges/measure?project=configr&metric=alert_status&token=03f7d1d98ef6507eba0d8b921f42fdce9b409df5)](http://sc-devsecops-sonar.eastus.cloudapp.azure.com:9000/dashboard?id=configr)
 
 
 <u>Planned Features</u>
