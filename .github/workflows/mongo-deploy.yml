@@ -13,7 +13,7 @@ jobs:
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
-          dns-name-label: configr-mongo-dev
+          dns-name-label: configr-mongodb-dev
           image: mongo:4.2.16
           name: configr-mongo-dev
           ports: 27017
