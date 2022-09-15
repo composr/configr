@@ -40,5 +40,4 @@ Java Spring Boot application with MongoDB storage.
    *Install for your IDE or you will not be able to compile the code
 4. MongoDB (5+ recommended)
 
-
 To build executable jar, use: `mvn clean package spring-boot:repackage`
