@@ -59,7 +59,7 @@ public class MongoOperations implements StoreOperations {
       JsonNode oldTree = objectMapper.readTree(objectMapper.writeValueAsString(ns));
       JsonNode newTree = objectMapper.readTree(objectMapper.writeValueAsString(newVersion));
 
-      String patch = objectMapper.writeValueAsString(JsonDiff.asJson(oldTree, newTree));
+      String patch = objectMapper.writeValueAsString(JsonDiff.asJson(newTree, oldTree));
 
       String collectionName =
           VERSION_COLLECTION_PREFIX + Hashing.sha256().hashString(ns.getNamespace()).toString();
