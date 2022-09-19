@@ -66,7 +66,7 @@ public class NamespaceController {
     return configurationService.storeNamespaceValue(json, getTrimmedPath(request), true, true);
   }
 
-  @PreAuthorize("@authorizer.canWrite()")
+  @PreAuthorize("@authorizer.canDelete()")
   @DeleteMapping(value = "/**", produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody Namespace delete(HttpServletRequest request, HttpServletResponse response)
       throws IOException {

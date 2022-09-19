@@ -17,6 +17,9 @@ public class AuthorizationService {
   @Value("${authorization.roles.write}")
   private String writeAllowedRoles;
 
+  @Value("${authorization.roles.delete}")
+  private String deleteAllowedRoles;
+
   public boolean canRead() {
     if (enabled) {
       BearerTokenAuthentication token =
@@ -33,6 +36,16 @@ public class AuthorizationService {
           (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
       return token.getAuthorities().stream()
           .anyMatch(p -> writeAllowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
+    } else
+      return true;
+  }
+
+  public boolean canDelete() {
+    if (enabled) {
+      BearerTokenAuthentication token =
+          (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
+      return token.getAuthorities().stream()
+          .anyMatch(p -> deleteAllowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
     } else
       return true;
   }
