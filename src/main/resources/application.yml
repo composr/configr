@@ -22,6 +22,10 @@ mongodb:
   password:
   mongo_keystore_path:
   mongo_keystore_password:
+  cert_subject:
+  azure_kv_uri:
+  azure_kv_cert_key:
+  azure_kv_password_key:
 azure:
   activedirectory:
     client-id: 11111111-1111-1111-1111-1111111111111111
