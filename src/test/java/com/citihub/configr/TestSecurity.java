@@ -103,7 +103,6 @@ public class TestSecurity extends SecureIntegrationTest {
   @WithMockToken(authorities = "read")
   @Test
   public void testCannotReadMetadata() throws Exception {
-    // mock metadata service and return acls
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_read", true, false, false));
 
