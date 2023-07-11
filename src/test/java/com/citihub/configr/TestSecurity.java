@@ -87,13 +87,17 @@ public class TestSecurity extends SecureIntegrationTest {
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_read", true, false, false));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_read_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_read_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(get("/configuration/services/test_md_read_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
+    mockMvc
+        .perform(get("/configuration/services/test_md_read_service")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isNotFound());
   }
 
@@ -104,13 +108,17 @@ public class TestSecurity extends SecureIntegrationTest {
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_read", true, false, false));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_read_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_read_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(get("/configuration/services/test_md_read_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
+    mockMvc
+        .perform(get("/configuration/services/test_md_read_service")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isForbidden());
   }
 
@@ -121,14 +129,16 @@ public class TestSecurity extends SecureIntegrationTest {
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_write", false, true, false));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_write_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_write_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(post("/configuration/services/test_md_write_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
-        .andExpect(status().isOk());
+    mockMvc.perform(post("/configuration/services/test_md_write_service")
+        .contentType(MediaType.APPLICATION_JSON).content("{}")).andExpect(status().isOk());
   }
 
   @WithMockToken(authorities = "write")
@@ -138,16 +148,20 @@ public class TestSecurity extends SecureIntegrationTest {
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_write", false, true, false));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_write_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_write_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(post("/configuration/services/test_md_write_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
+    mockMvc
+        .perform(post("/configuration/services/test_md_write_service")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isForbidden());
   }
-  
+
   @WithMockToken(authorities = "test_service_meta_admin")
   @Test
   public void testCanDeleteMetadata() throws Exception {
@@ -156,13 +170,17 @@ public class TestSecurity extends SecureIntegrationTest {
     // admin can do everything ;-)
     acls.add(new ACL("test_service_meta_admin", true, true, true));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_delete_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_delete_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(delete("/configuration/services/test_md_delete_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
+    mockMvc
+        .perform(delete("/configuration/services/test_md_delete_service")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isNotFound());
   }
 
@@ -173,13 +191,17 @@ public class TestSecurity extends SecureIntegrationTest {
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_admin", true, true, true));
 
-    Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service", "meta data for test service",
-                                    acls, null, ValidationLevel.NONE, null);
+    Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service",
+        "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito.when(mockMetaDataService.getMetadataForNamespace("/configuration/services/test_md_delete_service"))
+    Mockito
+        .when(mockMetaDataService
+            .getMetadataForNamespace("/configuration/services/test_md_delete_service"))
         .thenReturn(Optional.of(testMetadata));
 
-    mockMvc.perform(delete("/configuration/services/test_md_delete_service").contentType(MediaType.APPLICATION_JSON).content("{}"))
+    mockMvc
+        .perform(delete("/configuration/services/test_md_delete_service")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isForbidden());
   }
 }

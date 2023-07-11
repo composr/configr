@@ -20,16 +20,16 @@ public class AuthorizationService {
 
   @Value("${authorization.roles.delete}")
   private String deleteAllowedRoles;
-  
+
   private AclValidator aclValidator;
 
   public AuthorizationService(@Autowired AclValidator aclValidator) {
     this.aclValidator = aclValidator;
   }
 
-  public boolean canRead() {    
+  public boolean canRead() {
     if (enabled) {
-      return this.aclValidator.validateAcls(AclValidator.Action.READ, readAllowedRoles);      
+      return this.aclValidator.validateAcls(AclValidator.Action.READ, readAllowedRoles);
     } else
       return true;
   }
@@ -46,6 +46,6 @@ public class AuthorizationService {
       return this.aclValidator.validateAcls(AclValidator.Action.DELETE, deleteAllowedRoles);
     } else
       return true;
-  }  
+  }
 
 }
