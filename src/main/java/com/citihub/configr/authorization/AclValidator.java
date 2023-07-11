@@ -45,7 +45,6 @@ public class AclValidator {
             return validateRoles(action, metadata.get().getAcls(), token.getAuthorities());
         }
 
-        // default:
         return token.getAuthorities().stream()
                 .anyMatch(p -> allowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
 
