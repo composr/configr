@@ -1,9 +1,10 @@
 package com.citihub.configr.api;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Component;
+
+import com.citihub.configr.authorization.AclValidator;
 
 @Component("authorizer")
 public class AuthorizationService {
@@ -20,32 +21,29 @@ public class AuthorizationService {
   @Value("${authorization.roles.delete}")
   private String deleteAllowedRoles;
 
+  private AclValidator aclValidator;
+
+  public AuthorizationService(@Autowired AclValidator aclValidator) {
+    this.aclValidator = aclValidator;
+  }
+
   public boolean canRead() {
     if (enabled) {
-      BearerTokenAuthentication token =
-          (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
-      return token.getAuthorities().stream()
-          .anyMatch(p -> readAllowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
+      return this.aclValidator.validateAcls(AclValidator.Action.READ, readAllowedRoles);
     } else
       return true;
   }
 
   public boolean canWrite() {
     if (enabled) {
-      BearerTokenAuthentication token =
-          (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
-      return token.getAuthorities().stream()
-          .anyMatch(p -> writeAllowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
+      return this.aclValidator.validateAcls(AclValidator.Action.WRITE, writeAllowedRoles);
     } else
       return true;
   }
 
   public boolean canDelete() {
     if (enabled) {
-      BearerTokenAuthentication token =
-          (BearerTokenAuthentication) SecurityContextHolder.getContext().getAuthentication();
-      return token.getAuthorities().stream()
-          .anyMatch(p -> deleteAllowedRoles.matches(".*?" + p.getAuthority() + ".*?"));
+      return this.aclValidator.validateAcls(AclValidator.Action.DELETE, deleteAllowedRoles);
     } else
       return true;
   }
