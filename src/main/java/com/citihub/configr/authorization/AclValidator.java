@@ -54,7 +54,7 @@ public class AclValidator {
     private boolean validateRoles(Action action, Set<ACL> acls,
             Collection<GrantedAuthority> authorities) {
         for (ACL acl : acls) {
-            if (aclMatchesAction(action, acl) && roleInToken(acl, authorities)) {
+            if (aclMatchesAction(action, acl) && roleInToken(acl.getRole(), authorities)) {
                 return true;
             }
         }
