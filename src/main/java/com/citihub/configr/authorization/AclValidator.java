@@ -71,8 +71,7 @@ public class AclValidator {
         return false;
     }
 
-    private boolean roleInToken(ACL acl, Collection<GrantedAuthority> authorities) {
-        String role = acl.getRole();
+    private boolean roleInToken(String role, Collection<GrantedAuthority> authorities) {        
         return authorities.stream().anyMatch(
                 grantedAuthority -> grantedAuthority.getAuthority().matches(".*?" + role + ".*?"));
     }
