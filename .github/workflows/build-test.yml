@@ -15,17 +15,8 @@ jobs:
         with:
           java-version: '16'
           distribution: 'adopt'
-      - name: Setup target dir for Contrast
-        run: mkdir -p /home/runner/work/configr/configr/target
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots contrast:install verify
-        env:
-          CONTRAST__API__API_KEY: ${{ secrets.CONTRAST__API__API_KEY }}
-          CONTRAST__API__ORGANIZATION_ID: ${{ secrets.CONTRAST__API__ORGANIZATION_ID }}
-          CONTRAST__API__SERVICE_KEY: ${{ secrets.CONTRAST__API__SERVICE_KEY }}
-          CONTRAST__API__URL: ${{ secrets.CONTRAST__API__URL }}
-          CONTRAST__API__USER_NAME: ${{ secrets.CONTRAST__API__USER_NAME }}
-          CONTRAST__CI_ENVIRONMENT: ${{ secrets.CONTRAST__CI_ENVIRONMENT }}
+        run: mvn --batch-mode --update-snapshots
       - name: "Codecov upload"
         uses: codecov/codecov-action@v2
         with:
