@@ -123,7 +123,6 @@ public class TestSecurity extends SecureIntegrationTest {
   @WithMockToken(authorities = "test_service_meta_write")
   @Test
   public void testCanWriteMetadata() throws Exception {
-    // mock metadata service and return acls
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_write", false, true, false));
 
