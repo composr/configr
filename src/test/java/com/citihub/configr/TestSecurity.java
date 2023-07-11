@@ -185,7 +185,6 @@ public class TestSecurity extends SecureIntegrationTest {
   @WithMockToken(authorities = "write")
   @Test
   public void testCannotDeleteMetadata() throws Exception {
-    // mock metadata service and return acls
     Set<ACL> acls = new HashSet<ACL>();
     acls.add(new ACL("test_service_meta_admin", true, true, true));
 
