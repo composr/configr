@@ -1,6 +1,7 @@
 package com.citihub.configr.metadata;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.base.IntegrationTest;
 import com.citihub.configr.metadata.Metadata.ValidationLevel;
 import com.citihub.configr.mongostorage.MongoMetadataRepository;
+import com.citihub.configr.mongostorage.MongoMetadataStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import com.mongodb.client.MongoClient;
 
 public class MetadataIntegrationTest extends IntegrationTest {
@@ -131,6 +136,57 @@ public class MetadataIntegrationTest extends IntegrationTest {
 
     mockMvc.perform(get("/metadata/x/y/z")).andExpect(status().isOk())
         .andExpect(content().json(mapper.writeValueAsString(testMetadata)));
+
+    Mockito.reset(metadataRepository);
+  }
+
+  @Test
+  public void testCascadingACLsIntoNone() throws Exception {
+    Metadata expected = new Metadata("/x/y/z", MongoMetadataStore.CASCADED_DESCRIPTION, testACLSet,
+        null, ValidationLevel.NONE, null);
+
+
+    when(metadataRepository.findById(any(String.class))).thenReturn(Optional.empty());
+    when(metadataRepository.findById(eq("/x"))).thenReturn(Optional.of(testMetadata));
+
+    mockMvc.perform(get("/metadata/x/y/z")).andExpect(status().isOk())
+        .andExpect(content().json(mapper.writeValueAsString(expected)));
+
+    Mockito.reset(metadataRepository);
+  }
+
+  @Test
+  public void testCascadingACLsIntoMetadataWithoutACLs() throws Exception {
+    Metadata rootMetadata =
+        new Metadata("/x/y/z", "Hello world", null, null, ValidationLevel.NONE, null);
+    Metadata expected =
+        new Metadata("/x/y/z", "Hello world", testACLSet, null, ValidationLevel.NONE, null);
+
+    when(metadataRepository.findById(any(String.class))).thenReturn(Optional.of(rootMetadata));
+    when(metadataRepository.findById(eq("/x"))).thenReturn(Optional.of(testMetadata));
+
+    mockMvc.perform(get("/metadata/x/y/z")).andExpect(status().isOk())
+        .andExpect(content().json(mapper.writeValueAsString(expected)));
+
+    Mockito.reset(metadataRepository);
+  }
+
+  @Test
+  public void testMergingCascadingACLs() throws Exception {
+    Metadata rootMetadata =
+        new Metadata("/x/y/z", "Foo bar", Sets.newHashSet(new ACL("admin", true, true, true)), null,
+            ValidationLevel.NONE, Sets.newHashSet("Foo", "bar", "baz"));
+
+    Metadata expected = new Metadata(
+        "/x/y/z", "Foo bar", Stream.of(rootMetadata.getAcls(), testMetadata.getAcls())
+            .flatMap(x -> x.stream()).collect(Collectors.toSet()),
+        null, ValidationLevel.NONE, Sets.newHashSet("Foo", "bar", "baz"));
+
+    when(metadataRepository.findById(eq("/x/y/z"))).thenReturn(Optional.of(rootMetadata));
+    when(metadataRepository.findById(eq("/x"))).thenReturn(Optional.of(testMetadata));
+
+    mockMvc.perform(get("/metadata/x/y/z")).andExpect(status().isOk())
+        .andExpect(content().json(mapper.writeValueAsString(expected)));
 
     Mockito.reset(metadataRepository);
   }

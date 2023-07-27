@@ -77,7 +77,7 @@ public class MongoConfiguration {
     else if (!Strings.isNullOrEmpty(azureKVUri))
       return getX509FromAzure();
     else
-      return null;
+      return getNoAuth();
   }
 
   public @Bean MongoDatabaseFactory mongoDatabaseFactory() {
@@ -87,6 +87,12 @@ public class MongoConfiguration {
   public @Bean MongoTemplate mongoTemplate() {
     return new MongoTemplate(mongoDatabaseFactory(), mongoConverter);
   }
+
+  private MongoClientSettings getNoAuth() {
+    log.info("Using No auth with MongoDB");
+    return MongoClientSettings.builder().applyConnectionString(new ConnectionString(uri)).build();
+  }
+
 
   private MongoClientSettings getBasicCredentialAuth() {
     log.info("Using basic auth with MongoDB");
