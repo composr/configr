@@ -2,14 +2,12 @@ package com.citihub.configr;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.citihub.configr.base.SecureIntegrationTest;
 import com.citihub.configr.metadata.ACL;
 import com.citihub.configr.metadata.Metadata;
-import com.citihub.configr.metadata.MetadataService;
 import com.citihub.configr.metadata.Metadata.ValidationLevel;
+import com.citihub.configr.metadata.MetadataService;
 
 public class TestSecurity extends SecureIntegrationTest {
 
@@ -89,9 +87,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_read_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_read_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc
@@ -109,9 +105,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_read_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_read_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_read_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc
@@ -129,9 +123,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_write_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_write_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc.perform(post("/configuration/services/test_md_write_service")
@@ -147,9 +139,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_write_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_write_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_write_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc
@@ -169,9 +159,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_delete_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_delete_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc
@@ -189,9 +177,7 @@ public class TestSecurity extends SecureIntegrationTest {
     Metadata testMetadata = new Metadata("/metadata/services/test_md_delete_service",
         "meta data for test service", acls, null, ValidationLevel.NONE, null);
 
-    Mockito
-        .when(mockMetaDataService
-            .getMetadataForNamespace("/configuration/services/test_md_delete_service"))
+    Mockito.when(mockMetaDataService.getMetadataForNamespace("/services/test_md_delete_service"))
         .thenReturn(Optional.of(testMetadata));
 
     mockMvc
